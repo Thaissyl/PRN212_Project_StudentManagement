@@ -11,26 +11,19 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using PRN212_Project_StudentManagement.ViewModels;
 
 namespace PRN212_Project_StudentManagement.Views
 {
     /// <summary>
-    /// Interaction logic for LoginView.xaml
+    /// Interaction logic for AddStudentView.xaml
     /// </summary>
-    public partial class LoginView : Window
+    public partial class AddStudentView : Window
     {
-        public LoginView()
+        public AddStudentView()
         {
             InitializeComponent();
-        }
-        private void Window_MouseDown(object sender, MouseEventArgs e)
-        {
-            if(e.LeftButton == MouseButtonState.Pressed) DragMove();
-        }
-
-        private void Close_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
+            this.DataContext = new AddStudentViewModel(this);
         }
     }
 }

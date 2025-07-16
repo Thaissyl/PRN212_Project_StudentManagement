@@ -101,7 +101,7 @@ public partial class DBContext : DbContext
 
             entity.HasOne(d => d.User).WithOne(p => p.Student)
                 .HasForeignKey<Student>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Students__UserID__4F7CD00D");
         });
 
