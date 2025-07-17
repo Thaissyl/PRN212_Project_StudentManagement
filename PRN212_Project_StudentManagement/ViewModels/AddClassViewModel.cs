@@ -16,7 +16,6 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private int _selectedTeacherId;
         private string _academicYear;
         private ObservableCollection<Teacher> _teachers;
-        private string _teacherName;
         public string ClassName
         {
             get { return _className; }
@@ -24,15 +23,6 @@ namespace PRN212_Project_StudentManagement.ViewModels
             {
                 _className = value;
                 OnPropertyChanged(nameof(ClassName));
-            }
-        }
-        public string TeacherName
-        {
-            get { return _teacherName; }
-            set
-            {
-                _teacherName = value;
-                OnPropertyChanged(nameof(TeacherName));
             }
         }
         public int SelectedTeacherId
