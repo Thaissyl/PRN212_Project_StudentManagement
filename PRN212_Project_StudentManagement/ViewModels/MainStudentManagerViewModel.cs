@@ -145,7 +145,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void LoadClassNames()
         {
-            var classNames = _classRepository.GetAll().Select(c => c.ClassName).ToList();
+            var classNames = _classRepository.GetAllClasses().Select(c => c.ClassName).ToList();
             classNames.Insert(0, "All Classes");
             ClassNames = new ObservableCollection<string>(classNames);
             SelectedClassFilter = "All Classes";

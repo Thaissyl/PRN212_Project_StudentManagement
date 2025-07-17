@@ -1,4 +1,5 @@
 using PRN212_Project_StudentManagement.Data.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using PRN212_Project_StudentManagement.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +27,9 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
             _context.SaveChanges();
         }
 
-        public IEnumerable<Class> GetAll()
+        public List<Class> GetAllClasses()
         {
-            return _context.Classes.ToList();
+            return _context.Classes.Include(c => c.Teacher).ThenInclude(t => t.User).ToList();
         }
 
         public void UpdateClass(Class selectedClass)

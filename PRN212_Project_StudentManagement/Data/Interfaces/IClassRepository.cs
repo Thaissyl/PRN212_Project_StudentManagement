@@ -7,7 +7,7 @@ namespace PRN212_Project_StudentManagement.Data.Interfaces
     {
         void AddClass(Class @class);
         void DeleteClass(int classId);
-        IEnumerable<Class> GetAll();
+        List<Class> GetAllClasses();
         void UpdateClass(Class selectedClass);
     }
 }

@@ -1,6 +1,7 @@
 using PRN212_Project_StudentManagement.Data.Interfaces;
 using PRN212_Project_StudentManagement.Data.Repositories;
 using PRN212_Project_StudentManagement.Models;
+using PRN212_Project_StudentManagement.Views;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
@@ -48,18 +49,19 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void LoadClasses()
         {
-            Classes = new ObservableCollection<Class>(_classRepository.GetAll());
+            Classes = new ObservableCollection<Class>(_classRepository.GetAllClasses());
         }
 
         private bool CanExecuteAddClassCommand(object obj)
         {
-            return SelectedClass != null && !string.IsNullOrWhiteSpace(SelectedClass.ClassName);
+            return true;
         }
 
         private void ExecuteAddClassCommand(object obj)
         {
-            _classRepository.AddClass(new Class { ClassName = SelectedClass.ClassName });
-            LoadClasses();
+            var addClassView = new AddClassView();
+            addClassView.ShowDialog();
+            LoadClasses(); // Refresh the list after the dialog is closed
         }
 
         private bool CanExecuteUpdateClassCommand(object obj)
