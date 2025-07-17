@@ -14,9 +14,27 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
             _context = new DBContext();
         }
 
+        public void AddClass(Class @class)
+        {
+             _context.Classes.Add(@class);
+            _context.SaveChanges();
+        }
+
+        public void DeleteClass(int classId)
+        {
+            _context.Classes.Remove(_context.Classes.Find(classId));
+            _context.SaveChanges();
+        }
+
         public IEnumerable<Class> GetAll()
         {
             return _context.Classes.ToList();
+        }
+
+        public void UpdateClass(Class selectedClass)
+        {
+            _context.Classes.Update(selectedClass);
+            _context.SaveChanges();
         }
     }
 }

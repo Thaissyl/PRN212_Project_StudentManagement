@@ -1,6 +1,7 @@
 using PRN212_Project_StudentManagement.Data.Interfaces;
 using PRN212_Project_StudentManagement.Models;
 using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -24,14 +25,14 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         public ICommand RegisterCommand { get; }
         public ICommand CancelCommand { get; }
-        public System.Collections.ObjectModel.ObservableCollection<string> Roles { get; set; }
+        public ObservableCollection<string> Roles { get; set; }
 
         public RegisterViewModel(IUserRepository userRepository, Window window)
         {
             _userRepository = userRepository;
             _window = window;
             _newUser = new User();
-            Roles = new System.Collections.ObjectModel.ObservableCollection<string> { "Student", "Teacher" };
+            Roles = new ObservableCollection<string> { "Student", "Teacher" };
             RegisterCommand = new ViewModelCommand(ExecuteRegisterCommand, CanExecuteRegisterCommand);
             CancelCommand = new ViewModelCommand(ExecuteCancelCommand);
         }

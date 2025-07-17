@@ -9,21 +9,21 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using PRN212_Project_StudentManagement.ViewModels;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace PRN212_Project_StudentManagement.Views
 {
-    public partial class LoginView : Window
+    /// <summary>
+    /// Interaction logic for MainClassView.xaml
+    /// </summary>
+    public partial class MainClassView : Window
     {
-        public LoginView()
+        public MainClassView()
         {
             InitializeComponent();
-        }
-
-        private void Close_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
+            DataContext = new MainClassViewModel();
         }
     }
 }

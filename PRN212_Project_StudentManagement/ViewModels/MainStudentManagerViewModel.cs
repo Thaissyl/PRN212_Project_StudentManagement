@@ -14,11 +14,13 @@ namespace PRN212_Project_StudentManagement.ViewModels
     public class MainStudentManagerViewModel : ViewModelBase
     {
         private readonly IStudentRepository _studentRepository;
+        private readonly IClassRepository _classRepository;
         private ObservableCollection<StudentDTO> _students;
         private ObservableCollection<StudentDTO> _allStudents; // Store all students for filtering
         private StudentDTO _selectedStudent;
         private string _searchName;
         private string _searchStudentId;
+        private string _selectedClassFilter;
         private User _currentUser;
 
         public ICommand AddCommand { get; }
@@ -67,6 +69,17 @@ namespace PRN212_Project_StudentManagement.ViewModels
             }
         }
 
+        public string SelectedClassFilter
+        {
+            get { return _selectedClassFilter; }
+            set
+            {
+                _selectedClassFilter = value;
+                OnPropertyChanged(nameof(SelectedClassFilter));
+                ExecuteSearchCommand(null);
+            }
+        }
+
         public ObservableCollection<string> ClassNames { get; set; }
 
         public ICommand LogoutCommand { get; }
@@ -74,6 +87,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand SearchCommand { get; }
         public ICommand ResetCommand { get; }
         public ICommand DeleteCommand { get; }
+        public ICommand NavigateToClassViewCommand { get; }
 
         public string TeacherFullName
         {
@@ -84,6 +98,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
         {
             _currentUser = currentUser;
             _studentRepository = new StudentRepository();
+            _classRepository = new ClassRepository();
             LogoutCommand = new ViewModelCommand(ExecuteLogoutCommand);
             EditProfileCommand = new ViewModelCommand(ExecuteEditProfileCommand);
             UpdateCommand = new ViewModelCommand(ExecuteUpdateCommand, CanExecuteUpdateCommand);
@@ -91,6 +106,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
             ResetCommand = new ViewModelCommand(ExecuteResetCommand);
             AddCommand = new ViewModelCommand(ExecuteAddCommand); // Initialize AddCommand
             DeleteCommand = new ViewModelCommand(ExecuteDeleteCommand, CanExecuteDeleteCommand);
+            NavigateToClassViewCommand = new ViewModelCommand(ExecuteNavigateToClassViewCommand);
             LoadStudents();
             LoadClassNames();
         }
@@ -129,7 +145,10 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void LoadClassNames()
         {
-            ClassNames = new ObservableCollection<string>(_studentRepository.GetAllClassNames());
+            var classNames = _classRepository.GetAll().Select(c => c.ClassName).ToList();
+            classNames.Insert(0, "All Classes");
+            ClassNames = new ObservableCollection<string>(classNames);
+            SelectedClassFilter = "All Classes";
         }
 
         private void ExecuteLogoutCommand(object obj)
@@ -142,30 +161,32 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void ExecuteSearchCommand(object obj)
         {
             DebugSearch("Executing search with SearchName: " + SearchName + ", SearchStudentId: " + SearchStudentId);
-            if (string.IsNullOrWhiteSpace(SearchName) && string.IsNullOrWhiteSpace(SearchStudentId))
+            var filteredStudents = _allStudents.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(SearchName))
             {
-                Students = new ObservableCollection<StudentDTO>(_allStudents);
-                DebugSearch("No search criteria, showing all students.");
-                return;
+                filteredStudents = filteredStudents.Where(s => s.FullName.Contains(SearchName, StringComparison.OrdinalIgnoreCase));
             }
 
-            var filteredStudents = _allStudents.Where(student =>
+            if (!string.IsNullOrWhiteSpace(SearchStudentId))
             {
-                bool matchesName = string.IsNullOrWhiteSpace(SearchName) ||
-                    (!string.IsNullOrEmpty(student.FullName) && student.FullName.Contains(SearchName, StringComparison.OrdinalIgnoreCase));
-                bool matchesStudentId = string.IsNullOrWhiteSpace(SearchStudentId) ||
-                    student.StudentID.ToString().Contains(SearchStudentId, StringComparison.Ordinal);
-                return matchesName && matchesStudentId;
-            }).ToList();
+                filteredStudents = filteredStudents.Where(s => s.StudentID.ToString().Contains(SearchStudentId, StringComparison.OrdinalIgnoreCase));
+            }
 
-            Students = new ObservableCollection<StudentDTO>(filteredStudents);
-            DebugSearch("Found " + filteredStudents.Count + " matching students.");
+            if (!string.IsNullOrWhiteSpace(SelectedClassFilter) && SelectedClassFilter != "All Classes")
+            {
+                filteredStudents = filteredStudents.Where(s => s.ClassName == SelectedClassFilter);
+            }
+
+            Students = new ObservableCollection<StudentDTO>(filteredStudents.ToList());
+            DebugSearch("Found " + Students.Count + " matching students.");
         }
 
         private void ExecuteResetCommand(object obj)
         {
             SearchName = string.Empty;
             SearchStudentId = string.Empty;
+            SelectedClassFilter = "All Classes";
             SelectedStudent = null; // Reset the selected student to clear details
             Students = new ObservableCollection<StudentDTO>(_allStudents);
             DebugSearch("Reset applied, showing all students and cleared details.");
@@ -188,6 +209,13 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void DebugSearch(string message)
         {
             System.Diagnostics.Debug.WriteLine(message); // Use this in Visual Studio Output window
+        }
+
+        private void ExecuteNavigateToClassViewCommand(object obj)
+        {
+            var mainClassView = new MainClassView();
+            mainClassView.Show();
+            Application.Current.MainWindow.Close();
         }
     }
 }

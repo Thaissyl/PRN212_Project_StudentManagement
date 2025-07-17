@@ -5,6 +5,9 @@ namespace PRN212_Project_StudentManagement.Data.Interfaces
 {
     public interface IClassRepository
     {
+        void AddClass(Class @class);
+        void DeleteClass(int classId);
         IEnumerable<Class> GetAll();
+        void UpdateClass(Class selectedClass);
     }
 }
