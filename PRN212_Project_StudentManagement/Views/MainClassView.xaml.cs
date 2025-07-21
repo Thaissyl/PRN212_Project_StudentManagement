@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using PRN212_Project_StudentManagement.ViewModels;
+using PRN212_Project_StudentManagement.Models;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
@@ -20,10 +21,10 @@ namespace PRN212_Project_StudentManagement.Views
     /// </summary>
     public partial class MainClassView : Window
     {
-        public MainClassView()
+        public MainClassView(User currentUser)
         {
             InitializeComponent();
-            DataContext = new MainClassViewModel();
+            DataContext = new MainClassViewModel(currentUser);
         }
     }
 }

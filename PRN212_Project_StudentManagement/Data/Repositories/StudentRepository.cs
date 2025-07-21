@@ -12,13 +12,14 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
             {
                 var studentData = from s in context.Students
                                   join u in context.Users on s.UserId equals u.UserId
-                                  join c in context.Classes on s.ClassId equals c.ClassId
+                                  join c in context.Classes on s.ClassId equals c.ClassId into classJoin
+                                  from c in classJoin.DefaultIfEmpty()
                                   select new StudentDTO
                                   {
                                       StudentID = s.StudentId,
                                       FullName = u.FullName,
                                       Email = u.Email,
-                                      ClassName = c.ClassName,
+                                      ClassName = c != null ? c.ClassName : "No Class Assigned",
                                       EnrollmentDate = s.EnrollmentDate
                                   };
                 return studentData.ToList();
@@ -107,6 +108,67 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
                     context.Students.Remove(studentToDelete);
                     context.SaveChanges();
                 }
+            }
+        }
+
+        public IEnumerable<StudentDTO> GetUnassignedStudents()
+        {
+            using (var context = new DBContext())
+            {
+                // Get users with role "Student" who don't have corresponding Student records
+                var unassignedStudents = from u in context.Users
+                                        where u.Role == "Student" && 
+                                              !context.Students.Any(s => s.UserId == u.UserId)
+                                        select new StudentDTO
+                                        {
+                                            StudentID = u.UserId, // Use UserId as StudentID for unassigned students
+                                            FullName = u.FullName,
+                                            Email = u.Email,
+                                            ClassName = "No Class Assigned",
+                                            EnrollmentDate = DateOnly.FromDateTime(DateTime.Now)
+                                        };
+                return unassignedStudents.ToList();
+            }
+        }
+
+        public void AssignStudentToClass(int studentId, string className)
+        {
+            using (var context = new DBContext())
+            {
+                var classEntity = context.Classes.FirstOrDefault(c => c.ClassName == className);
+                if (classEntity == null)
+                {
+                    throw new InvalidOperationException("Class not found.");
+                }
+
+                // For unassigned students, studentId is actually the UserId
+                // Check if this is an existing student or a new one
+                var existingStudent = context.Students.FirstOrDefault(s => s.StudentId == studentId);
+                
+                if (existingStudent != null)
+                {
+                    // Update existing student's class
+                    existingStudent.ClassId = classEntity.ClassId;
+                }
+                else
+                {
+                    // Create new student record
+                    var user = context.Users.FirstOrDefault(u => u.UserId == studentId && u.Role == "Student");
+                    if (user == null)
+                    {
+                        throw new InvalidOperationException("Student user not found.");
+                    }
+
+                    var newStudent = new Student
+                    {
+                        UserId = user.UserId,
+                        ClassId = classEntity.ClassId,
+                        EnrollmentDate = DateOnly.FromDateTime(DateTime.Now)
+                    };
+                    context.Students.Add(newStudent);
+                }
+
+                context.SaveChanges();
             }
         }
     }

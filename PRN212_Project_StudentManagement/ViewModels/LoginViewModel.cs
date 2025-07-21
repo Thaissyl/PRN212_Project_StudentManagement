@@ -45,6 +45,10 @@ namespace PRN212_Project_StudentManagement.ViewModels
             LoginCommand = new ViewModelCommand(ExecuteLoginCommand);
             RegisterCommand = new ViewModelCommand(ExecuteRegisterCommand);
             ForgotPasswordCommand = new ViewModelCommand(ExecuteForgotPasswordCommand);
+            
+            // Clear any previous error messages
+            ErrorMessage = string.Empty;
+            Email = string.Empty;
         }
 
         private void ExecuteLoginCommand(object obj)
@@ -60,13 +64,28 @@ namespace PRN212_Project_StudentManagement.ViewModels
                 using (var context = new DBContext())
                 {
                     var user = context.Users.FirstOrDefault(u => u.Email == Email && u.Password == passwordBox.Password);
-                    if (user != null && user.Role == "Teacher")
+                    if (user != null)
                     {
-                        var mainView = new MainStudentManagerView(user);
-                        var currentWindow = Application.Current.MainWindow;
-                        Application.Current.MainWindow = mainView;
-                        mainView.Show();
-                        currentWindow.Close();
+                        if (user.Role == "Teacher")
+                        {
+                            var mainView = new MainStudentManagerView(user);
+                            var currentWindow = Application.Current.MainWindow;
+                            Application.Current.MainWindow = mainView;
+                            mainView.Show();
+                            currentWindow.Close();
+                        }
+                        else if (user.Role == "Student")
+                        {
+                            var mainView = new MainStudentView(user);
+                            var currentWindow = Application.Current.MainWindow;
+                            Application.Current.MainWindow = mainView;
+                            mainView.Show();
+                            currentWindow.Close();
+                        }
+                        else
+                        {
+                            ErrorMessage = "Invalid role for this application";
+                        }
                     }
                     else
                     {

@@ -13,6 +13,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private readonly IClassRepository _classRepository;
         private ObservableCollection<Class> _classes;
         private Class _selectedClass;
+        private User _currentUser;
 
         public ObservableCollection<Class> Classes
         {
@@ -37,13 +38,18 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand AddClassCommand { get; }
         public ICommand UpdateClassCommand { get; }
         public ICommand DeleteClassCommand { get; }
+        public ICommand BackCommand { get; }
+        public ICommand RefreshCommand { get; }
 
-        public MainClassViewModel()
+        public MainClassViewModel(User currentUser)
         {
+            _currentUser = currentUser;
             _classRepository = new ClassRepository();
             AddClassCommand = new ViewModelCommand(ExecuteAddClassCommand, CanExecuteAddClassCommand);
             UpdateClassCommand = new ViewModelCommand(ExecuteUpdateClassCommand, CanExecuteUpdateClassCommand);
             DeleteClassCommand = new ViewModelCommand(ExecuteDeleteClassCommand, CanExecuteDeleteClassCommand);
+            BackCommand = new ViewModelCommand(ExecuteBackCommand);
+            RefreshCommand = new ViewModelCommand(ExecuteRefreshCommand);
             LoadClasses();
         }
 
@@ -87,6 +93,27 @@ namespace PRN212_Project_StudentManagement.ViewModels
                 _classRepository.DeleteClass(SelectedClass.ClassId);
                 LoadClasses();
             }
+        }
+
+        private void ExecuteBackCommand(object obj)
+        {
+            var mainStudentManagerView = new MainStudentManagerView(_currentUser);
+            Application.Current.MainWindow = mainStudentManagerView;
+            mainStudentManagerView.Show();
+            
+            // Close current window
+            if (obj is Window window)
+            {
+                window.Close();
+            }
+        }
+
+        private void ExecuteRefreshCommand(object obj)
+        {
+            // Clear the selected class to reset the details section
+            SelectedClass = null;
+            // Reload the classes list
+            LoadClasses();
         }
     }
 }

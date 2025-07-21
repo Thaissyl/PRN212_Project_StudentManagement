@@ -11,27 +11,31 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using PRN212_Project_StudentManagement.Models;
+using PRN212_Project_StudentManagement.ViewModels;
 
 namespace PRN212_Project_StudentManagement.Views
 {
-    public partial class LoginView : Window
+    /// <summary>
+    /// Interaction logic for MainStudentView.xaml
+    /// </summary>
+    public partial class MainStudentView : Window
     {
-        public LoginView()
+        public MainStudentView(User user)
         {
             InitializeComponent();
-            this.Loaded += LoginView_Loaded;
+            this.DataContext = new MainStudentViewModel(user);
         }
 
-        private void LoginView_Loaded(object sender, RoutedEventArgs e)
+        private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Clear the password box when the window is loaded
-            if (PasswordBox != null)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                PasswordBox.Clear();
+                DragMove();
             }
         }
 
-        private void Close_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }

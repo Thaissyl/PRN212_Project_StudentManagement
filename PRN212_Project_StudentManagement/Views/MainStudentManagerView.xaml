@@ -5,6 +5,9 @@
     xmlns:local="clr-namespace:PRN212_Project_StudentManagement.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:PRN212_Project_StudentManagement.ViewModels" Title="Student Management System" Width="1000" Height="600" WindowStartupLocation="CenterScreen" mc:Ignorable="d">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -16,7 +19,7 @@
         <!--  Header  -->
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
             <Button Margin="0,0,10,0" Command="{Binding EditProfileCommand}" Content="{Binding TeacherFullName}" />
-            <Button Width="80" Command="{Binding LogoutCommand}" Content="Logout" />
+            <Button Width="80" Command="{Binding LogoutCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Content="Logout" />
         </StackPanel>
 
         <!--  Search  -->
@@ -28,7 +31,7 @@
             <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" Text="Class:" />
             <ComboBox Width="120" Margin="0,0,10,0" ItemsSource="{Binding ClassNames}" SelectedItem="{Binding SelectedClassFilter}" />
             <Button Width="80" Command="{Binding SearchCommand}" Content="Search" />
-            <Button Width="80" Margin="10,0,0,0" Command="{Binding ResetCommand}" Content="Reset" />
+            <Button Width="80" Margin="10,0,0,0" Command="{Binding ResetCommand}" Content="Refresh" />
         </StackPanel>
 
         <Grid Grid.Row="2">
@@ -42,29 +45,84 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="*" Binding="{Binding StudentID}" Header="Student ID" />
                     <DataGridTextColumn Width="*" Binding="{Binding FullName}" Header="Student Name" />
+                    <DataGridTextColumn Width="*" Binding="{Binding Email}" Header="Email" />
                     <DataGridTextColumn Width="*" Binding="{Binding ClassName}" Header="Class Name" />
                     <DataGridTextColumn Width="*" Binding="{Binding EnrollmentDate, StringFormat='dd/MM/yyyy'}" Header="Enrollment Date" />
                 </DataGrid.Columns>
             </DataGrid>
 
             <!--  Student Details  -->
-            <StackPanel Grid.Column="1" Margin="10,0,0,0" DataContext="{Binding SelectedStudent}">
+            <StackPanel Grid.Column="1" Margin="10,0,0,0">
                 <TextBlock Margin="0,0,0,10" FontSize="18" FontWeight="Bold" Text="Student Details" />
-                <TextBlock Text="Student ID" />
-                <TextBox Margin="0,5,0,10" IsReadOnly="True" Text="{Binding StudentID, Mode=OneWay}" />
-                <TextBlock Text="Name" />
-                <TextBox Margin="0,5,0,10" Text="{Binding FullName}" />
-                <TextBlock Text="Date of Birth" />
-                <DatePicker Margin="0,5,0,10" SelectedDate="{Binding EnrollmentDateTime}" />
-                <TextBlock Text="Class" />
-                <ComboBox Margin="0,5,0,20" ItemsSource="{Binding DataContext.ClassNames, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ClassName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <Button Width="80" Margin="5" Background="Green" Command="{Binding DataContext.AddCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Add" Foreground="White" />
-                    <Button Width="80" Margin="5" Background="Orange" Command="{Binding DataContext.UpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Update" Foreground="White" />
-                    <Button Width="80" Margin="5" Background="Red" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Delete" Foreground="White" />
+                
+                <!-- Unassigned Students Select Box -->
+                <StackPanel Visibility="{Binding DataContext.IsAddingNewStudent, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Unassigned Students:" Margin="0,0,0,5" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <ComboBox Width="200" 
+                                  ItemsSource="{Binding UnassignedStudents}" 
+                                  SelectedItem="{Binding SelectedUnassignedStudent}"
+                                  DisplayMemberPath="FullName" />
+                        <Button Width="80" Margin="5,0,0,0" 
+                                Background="Purple" 
+                                Foreground="White"
+                                Command="{Binding AssignCommand}"
+                                Content="Assign" />
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <Button Width="80" Margin="5" Background="Blue" Command="{Binding DataContext.NavigateToClassViewCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Class" Foreground="White" />
+                
+                <!-- Add Mode -->
+                <StackPanel DataContext="{Binding NewStudent}" Visibility="{Binding DataContext.IsAddingNewStudent, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Name" />
+                    <TextBox Margin="0,5,0,10" Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Email" />
+                    <TextBox Margin="0,5,0,10" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Enrollment Date" />
+                    <DatePicker Margin="0,5,0,10" SelectedDate="{Binding EnrollmentDateTime, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Class" />
+                    <ComboBox Margin="0,5,0,20" ItemsSource="{Binding DataContext.ClassNames, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ClassName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button Width="80" Margin="5" Background="Green" Command="{Binding DataContext.SaveNewStudentCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Save" Foreground="White" />
+                        <Button Width="80" Margin="5" Background="Gray" Command="{Binding DataContext.CancelAddCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Cancel" Foreground="White" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Assign Mode -->
+                <StackPanel DataContext="{Binding SelectedUnassignedStudent}" Visibility="{Binding DataContext.IsAssigningStudent, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Student ID" />
+                    <TextBox Margin="0,5,0,10" IsReadOnly="True" Text="{Binding StudentID, Mode=OneWay}" />
+                    <TextBlock Text="Name" />
+                    <TextBox Margin="0,5,0,10" IsReadOnly="True" Text="{Binding FullName}" />
+                    <TextBlock Text="Email" />
+                    <TextBox Margin="0,5,0,10" IsReadOnly="True" Text="{Binding Email}" />
+                    <TextBlock Text="Class" />
+                    <ComboBox Margin="0,5,0,20" ItemsSource="{Binding DataContext.ClassNames, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ClassName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button Width="80" Margin="5" Background="Blue" Command="{Binding DataContext.AssignStudentCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Assign" Foreground="White" />
+                        <Button Width="80" Margin="5" Background="Gray" Command="{Binding DataContext.CancelAssignCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Cancel" Foreground="White" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Edit Mode -->
+                <StackPanel DataContext="{Binding SelectedStudent}" Visibility="{Binding DataContext.IsEditingStudent, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Student ID" />
+                    <TextBox Margin="0,5,0,10" IsReadOnly="True" Text="{Binding StudentID, Mode=OneWay}" />
+                    <TextBlock Text="Name" />
+                    <TextBox Margin="0,5,0,10" Text="{Binding FullName}" />
+                    <TextBlock Text="Email" />
+                    <TextBox Margin="0,5,0,10" Text="{Binding Email}" />
+                    <TextBlock Text="Enrollment Date" />
+                    <DatePicker Margin="0,5,0,10" SelectedDate="{Binding EnrollmentDateTime}" />
+                    <TextBlock Text="Class" />
+                    <ComboBox Margin="0,5,0,20" ItemsSource="{Binding DataContext.ClassNames, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding ClassName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button Width="80" Margin="5" Background="Green" Command="{Binding DataContext.AddCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Add" Foreground="White" />
+                        <Button Width="80" Margin="5" Background="Orange" Command="{Binding DataContext.UpdateCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Update" Foreground="White" />
+                        <Button Width="80" Margin="5" Background="Red" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Delete" Foreground="White" />
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button Width="80" Margin="5" Background="Blue" Command="{Binding DataContext.NavigateToClassViewCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Class" Foreground="White" />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>

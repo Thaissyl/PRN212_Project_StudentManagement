@@ -22,6 +22,11 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private string _searchStudentId;
         private string _selectedClassFilter;
         private User _currentUser;
+        private bool _isAddingNewStudent;
+        private StudentDTO _newStudent;
+        private ObservableCollection<StudentDTO> _unassignedStudents;
+        private StudentDTO _selectedUnassignedStudent;
+        private bool _isAssigningStudent;
 
         public ICommand AddCommand { get; }
         public ICommand EditProfileCommand { get; }
@@ -88,10 +93,72 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand ResetCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand NavigateToClassViewCommand { get; }
+        public ICommand SaveNewStudentCommand { get; }
+        public ICommand CancelAddCommand { get; }
+        public ICommand AssignStudentCommand { get; }
+        public ICommand CancelAssignCommand { get; }
+        public ICommand AssignCommand { get; }
 
         public string TeacherFullName
         {
             get { return _currentUser?.FullName; }
+        }
+
+        public bool IsAddingNewStudent
+        {
+            get => _isAddingNewStudent;
+            set
+            {
+                _isAddingNewStudent = value;
+                OnPropertyChanged(nameof(IsAddingNewStudent));
+                OnPropertyChanged(nameof(IsEditingStudent));
+            }
+        }
+
+        public StudentDTO NewStudent
+        {
+            get => _newStudent;
+            set
+            {
+                _newStudent = value;
+                OnPropertyChanged(nameof(NewStudent));
+            }
+        }
+
+        public bool IsEditingStudent
+        {
+            get => !_isAddingNewStudent && !_isAssigningStudent;
+        }
+
+        public ObservableCollection<StudentDTO> UnassignedStudents
+        {
+            get => _unassignedStudents;
+            set
+            {
+                _unassignedStudents = value;
+                OnPropertyChanged(nameof(UnassignedStudents));
+            }
+        }
+
+        public StudentDTO SelectedUnassignedStudent
+        {
+            get => _selectedUnassignedStudent;
+            set
+            {
+                _selectedUnassignedStudent = value;
+                OnPropertyChanged(nameof(SelectedUnassignedStudent));
+            }
+        }
+
+        public bool IsAssigningStudent
+        {
+            get => _isAssigningStudent;
+            set
+            {
+                _isAssigningStudent = value;
+                OnPropertyChanged(nameof(IsAssigningStudent));
+                OnPropertyChanged(nameof(IsEditingStudent));
+            }
         }
 
         public MainStudentManagerViewModel(User currentUser)
@@ -107,8 +174,16 @@ namespace PRN212_Project_StudentManagement.ViewModels
             AddCommand = new ViewModelCommand(ExecuteAddCommand); // Initialize AddCommand
             DeleteCommand = new ViewModelCommand(ExecuteDeleteCommand, CanExecuteDeleteCommand);
             NavigateToClassViewCommand = new ViewModelCommand(ExecuteNavigateToClassViewCommand);
+            SaveNewStudentCommand = new ViewModelCommand(ExecuteSaveNewStudentCommand, CanExecuteSaveNewStudentCommand);
+            CancelAddCommand = new ViewModelCommand(ExecuteCancelAddCommand);
+            AssignStudentCommand = new ViewModelCommand(ExecuteAssignStudentCommand, CanExecuteAssignStudentCommand);
+            CancelAssignCommand = new ViewModelCommand(ExecuteCancelAssignCommand);
+            AssignCommand = new ViewModelCommand(ExecuteAssignCommand);
+            NewStudent = new StudentDTO();
+            UnassignedStudents = new ObservableCollection<StudentDTO>();
             LoadStudents();
             LoadClassNames();
+            LoadUnassignedStudents();
         }
 
         private bool CanExecuteUpdateCommand(object obj)
@@ -154,8 +229,14 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void ExecuteLogoutCommand(object obj)
         {
             var loginView = new LoginView();
+            Application.Current.MainWindow = loginView;
             loginView.Show();
-            Application.Current.MainWindow.Close();
+            
+            // Close current window
+            if (obj is Window window)
+            {
+                window.Close();
+            }
         }
 
         private void ExecuteSearchCommand(object obj)
@@ -194,9 +275,10 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void ExecuteAddCommand(object obj)
         {
-            var addStudentView = new AddStudentView();
-            addStudentView.ShowDialog();
-            LoadStudents(); // Refresh the student list after adding
+            // Clear the details section and enter add mode
+            IsAddingNewStudent = true;
+            NewStudent = new StudentDTO();
+            SelectedStudent = null; // Clear any selected student
         }
 
         private void ExecuteEditProfileCommand(object obj)
@@ -213,9 +295,102 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void ExecuteNavigateToClassViewCommand(object obj)
         {
-            var mainClassView = new MainClassView();
+            var mainClassView = new MainClassView(_currentUser);
             mainClassView.Show();
             Application.Current.MainWindow.Close();
+        }
+
+        private bool CanExecuteSaveNewStudentCommand(object obj)
+        {
+            return IsAddingNewStudent &&
+                   !string.IsNullOrWhiteSpace(NewStudent.FullName) &&
+                   !string.IsNullOrWhiteSpace(NewStudent.Email) &&
+                   NewStudent.Email.Contains("@gmail.com") &&
+                   !string.IsNullOrWhiteSpace(NewStudent.ClassName) &&
+                   NewStudent.EnrollmentDateTime != default;
+        }
+
+        private void ExecuteSaveNewStudentCommand(object obj)
+        {
+            try
+            {
+                _studentRepository.AddStudent(NewStudent);
+                MessageBox.Show("Student added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                
+                // Exit add mode and refresh the list
+                IsAddingNewStudent = false;
+                NewStudent = new StudentDTO();
+                LoadStudents();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding student: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ExecuteCancelAddCommand(object obj)
+        {
+            // Exit add mode and clear the details
+            IsAddingNewStudent = false;
+            NewStudent = new StudentDTO();
+            SelectedStudent = null;
+        }
+
+        private void LoadUnassignedStudents()
+        {
+            var unassignedStudents = _studentRepository.GetUnassignedStudents();
+            UnassignedStudents = new ObservableCollection<StudentDTO>(unassignedStudents);
+        }
+
+        private bool CanExecuteAssignStudentCommand(object obj)
+        {
+            return IsAssigningStudent && 
+                   SelectedUnassignedStudent != null && 
+                   !string.IsNullOrWhiteSpace(SelectedUnassignedStudent.ClassName) &&
+                   SelectedUnassignedStudent.ClassName != "No Class Assigned";
+        }
+
+        private void ExecuteAssignStudentCommand(object obj)
+        {
+            try
+            {
+                _studentRepository.AssignStudentToClass(SelectedUnassignedStudent.StudentID, SelectedUnassignedStudent.ClassName);
+                MessageBox.Show("Student assigned to class successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                
+                // Exit assign mode and refresh lists
+                IsAssigningStudent = false;
+                SelectedUnassignedStudent = null;
+                LoadStudents();
+                LoadUnassignedStudents();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error assigning student to class: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ExecuteCancelAssignCommand(object obj)
+        {
+            // Exit assign mode and clear the details
+            IsAssigningStudent = false;
+            IsAddingNewStudent = false; // Return to normal state
+            SelectedUnassignedStudent = null;
+            SelectedStudent = null;
+        }
+
+        private void ExecuteAssignCommand(object obj)
+        {
+            // Check if an unassigned student is selected
+            if (SelectedUnassignedStudent == null)
+            {
+                MessageBox.Show("Please select an unassigned student first.", "No Student Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Exit add mode and enter assign mode
+            IsAddingNewStudent = false;
+            IsAssigningStudent = true;
+            SelectedStudent = null; // Clear any selected student
         }
     }
 }

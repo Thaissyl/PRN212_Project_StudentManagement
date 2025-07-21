@@ -10,5 +10,7 @@ namespace PRN212_Project_StudentManagement.Data.Interfaces
         IEnumerable<string> GetAllClassNames();
         void AddStudent(StudentDTO student);
         void DeleteStudent(int studentId);
+        IEnumerable<StudentDTO> GetUnassignedStudents();
+        void AssignStudentToClass(int studentId, string className);
     }
 }

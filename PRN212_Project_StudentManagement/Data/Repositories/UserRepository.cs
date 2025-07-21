@@ -13,6 +13,10 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
                 user.IsActive = true;
                 context.Users.Add(user);
                 context.SaveChanges();
+
+                // Note: We don't create Student/Teacher records here to avoid foreign key constraint issues
+                // Students will be created when they are assigned to a class
+                // Teachers will be created when they are assigned to a subject
             }
         }
 
