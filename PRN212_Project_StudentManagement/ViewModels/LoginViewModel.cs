@@ -82,6 +82,14 @@ namespace PRN212_Project_StudentManagement.ViewModels
                             mainView.Show();
                             currentWindow.Close();
                         }
+                        else if (user.Role == "Manager")
+                        {
+                            var mainView = new MainManagerView(user);
+                            var currentWindow = Application.Current.MainWindow;
+                            Application.Current.MainWindow = mainView;
+                            mainView.Show();
+                            currentWindow.Close();
+                        }
                         else
                         {
                             ErrorMessage = "Invalid role for this application";

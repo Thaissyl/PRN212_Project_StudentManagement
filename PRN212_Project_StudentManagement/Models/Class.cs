@@ -11,7 +11,8 @@ public partial class Class
 
     public int? TeacherId { get; set; }
 
-    public string AcademicYear { get; set; } = null!;
+    public int AcademicFromYear { get; set; }
+    public int AcademicToYear { get; set; }
 
     public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 

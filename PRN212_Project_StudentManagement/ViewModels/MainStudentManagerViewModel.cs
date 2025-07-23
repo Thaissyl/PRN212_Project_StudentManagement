@@ -173,7 +173,6 @@ namespace PRN212_Project_StudentManagement.ViewModels
             ResetCommand = new ViewModelCommand(ExecuteResetCommand);
             AddCommand = new ViewModelCommand(ExecuteAddCommand); // Initialize AddCommand
             DeleteCommand = new ViewModelCommand(ExecuteDeleteCommand, CanExecuteDeleteCommand);
-            NavigateToClassViewCommand = new ViewModelCommand(ExecuteNavigateToClassViewCommand);
             SaveNewStudentCommand = new ViewModelCommand(ExecuteSaveNewStudentCommand, CanExecuteSaveNewStudentCommand);
             CancelAddCommand = new ViewModelCommand(ExecuteCancelAddCommand);
             AssignStudentCommand = new ViewModelCommand(ExecuteAssignStudentCommand, CanExecuteAssignStudentCommand);
@@ -291,13 +290,6 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void DebugSearch(string message)
         {
             System.Diagnostics.Debug.WriteLine(message); // Use this in Visual Studio Output window
-        }
-
-        private void ExecuteNavigateToClassViewCommand(object obj)
-        {
-            var mainClassView = new MainClassView(_currentUser);
-            mainClassView.Show();
-            Application.Current.MainWindow.Close();
         }
 
         private bool CanExecuteSaveNewStudentCommand(object obj)

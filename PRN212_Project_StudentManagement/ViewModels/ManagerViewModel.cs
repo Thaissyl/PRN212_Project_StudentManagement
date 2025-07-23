@@ -1,3 +1,8 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using PRN212_Project_StudentManagement.Data.Interfaces;
 using PRN212_Project_StudentManagement.Data.Repositories;
 using PRN212_Project_StudentManagement.Models;
@@ -8,7 +13,7 @@ using System.Windows.Input;
 
 namespace PRN212_Project_StudentManagement.ViewModels
 {
-    public class MainClassViewModel : ViewModelBase
+    public class ManagerViewModel : ViewModelBase
     {
         private readonly IClassRepository _classRepository;
         private ObservableCollection<Class> _classes;
@@ -38,18 +43,22 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand AddClassCommand { get; }
         public ICommand UpdateClassCommand { get; }
         public ICommand DeleteClassCommand { get; }
-        public ICommand BackCommand { get; }
         public ICommand RefreshCommand { get; }
+        public ICommand AddTeacherCommand { get; }
+        public ICommand ShowTeacherInfoCommand { get; }
+        public ICommand ShowSubjectInfoCommand { get; }
 
-        public MainClassViewModel(User currentUser)
+        public ManagerViewModel(User currentUser)
         {
             _currentUser = currentUser;
             _classRepository = new ClassRepository();
             AddClassCommand = new ViewModelCommand(ExecuteAddClassCommand, CanExecuteAddClassCommand);
             UpdateClassCommand = new ViewModelCommand(ExecuteUpdateClassCommand, CanExecuteUpdateClassCommand);
             DeleteClassCommand = new ViewModelCommand(ExecuteDeleteClassCommand, CanExecuteDeleteClassCommand);
-            BackCommand = new ViewModelCommand(ExecuteBackCommand);
             RefreshCommand = new ViewModelCommand(ExecuteRefreshCommand);
+            AddTeacherCommand = new ViewModelCommand(ExecuteAddTeacherCommand);
+            ShowTeacherInfoCommand = new ViewModelCommand(ExecuteShowTeacherInfoCommand);
+            ShowSubjectInfoCommand = new ViewModelCommand(ExecuteShowSubjectInfoCommand);
             LoadClasses();
         }
 
@@ -95,25 +104,31 @@ namespace PRN212_Project_StudentManagement.ViewModels
             }
         }
 
-        private void ExecuteBackCommand(object obj)
-        {
-            var mainStudentManagerView = new MainStudentManagerView(_currentUser);
-            Application.Current.MainWindow = mainStudentManagerView;
-            mainStudentManagerView.Show();
-            
-            // Close current window
-            if (obj is Window window)
-            {
-                window.Close();
-            }
-        }
-
         private void ExecuteRefreshCommand(object obj)
         {
             // Clear the selected class to reset the details section
             SelectedClass = null;
             // Reload the classes list
             LoadClasses();
+        }
+
+        private void ExecuteAddTeacherCommand(object obj)
+        {
+            var addTeacherView = new Views.AddTeacherView();
+            addTeacherView.ShowDialog();
+            // Có thể load lại danh sách giáo viên nếu cần
+        }
+
+        private void ExecuteShowTeacherInfoCommand(object obj)
+        {
+            var teacherInfoView = new Views.TeacherInfoView();
+            teacherInfoView.ShowDialog();
+        }
+
+        private void ExecuteShowSubjectInfoCommand(object obj)
+        {
+            var subjectInfoView = new Views.SubjectInfoView();
+            subjectInfoView.ShowDialog();
         }
     }
 }

@@ -14,7 +14,8 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private readonly ITeacherRepository _teacherRepository;
         private string _className;
         private int _selectedTeacherId;
-        private string _academicYear;
+        private int _academicFromYear;
+        private int _academicToYear;
         private ObservableCollection<Teacher> _teachers;
         public string ClassName
         {
@@ -35,13 +36,22 @@ namespace PRN212_Project_StudentManagement.ViewModels
             }
         }
 
-        public string AcademicYear
+        public int AcademicFromYear
         {
-            get { return _academicYear; }
+            get { return _academicFromYear; }
             set
             {
-                _academicYear = value;
-                OnPropertyChanged(nameof(AcademicYear));
+                _academicFromYear = value;
+                OnPropertyChanged(nameof(AcademicFromYear));
+            }
+        }
+        public int AcademicToYear
+        {
+            get { return _academicToYear; }
+            set
+            {
+                _academicToYear = value;
+                OnPropertyChanged(nameof(AcademicToYear));
             }
         }
 
@@ -74,7 +84,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private bool CanExecuteSaveCommand(object obj)
         {
-            return !string.IsNullOrWhiteSpace(ClassName) && SelectedTeacherId > 0 && !string.IsNullOrWhiteSpace(AcademicYear);
+            return !string.IsNullOrWhiteSpace(ClassName) && SelectedTeacherId > 0 && AcademicFromYear > 0 && AcademicToYear > 0 && AcademicFromYear < AcademicToYear;
         }
 
         private void ExecuteSaveCommand(object obj)
@@ -83,7 +93,8 @@ namespace PRN212_Project_StudentManagement.ViewModels
             {
                 ClassName = this.ClassName,
                 TeacherId = this.SelectedTeacherId,
-                AcademicYear = this.AcademicYear
+                AcademicFromYear = this.AcademicFromYear,
+                AcademicToYear = this.AcademicToYear
             };
             _classRepository.AddClass(newClass);
             (obj as Window)?.Close();

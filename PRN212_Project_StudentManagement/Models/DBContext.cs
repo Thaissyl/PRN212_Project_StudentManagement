@@ -44,7 +44,6 @@ public partial class DBContext : DbContext
             entity.HasKey(e => e.ClassId).HasName("PK__Classes__CB1927A09D1D3B38");
 
             entity.Property(e => e.ClassId).HasColumnName("ClassID");
-            entity.Property(e => e.AcademicYear).HasMaxLength(9);
             entity.Property(e => e.ClassName).HasMaxLength(20);
             entity.Property(e => e.TeacherId).HasColumnName("TeacherID");
 

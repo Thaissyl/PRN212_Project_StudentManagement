@@ -9,22 +9,26 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using PRN212_Project_StudentManagement.ViewModels;
-using PRN212_Project_StudentManagement.Models;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using PRN212_Project_StudentManagement.ViewModels;
 
 namespace PRN212_Project_StudentManagement.Views
 {
     /// <summary>
-    /// Interaction logic for MainClassView.xaml
+    /// Interaction logic for MainManagerView.xaml
     /// </summary>
-    public partial class MainClassView : Window
+    public partial class MainManagerView : Window
     {
-        public MainClassView(User currentUser)
+        public MainManagerView()
         {
             InitializeComponent();
-            DataContext = new MainClassViewModel(currentUser);
+        }
+
+        public MainManagerView(Models.User user)
+        {
+            InitializeComponent();
+            DataContext = new ManagerViewModel(user);
         }
     }
 }

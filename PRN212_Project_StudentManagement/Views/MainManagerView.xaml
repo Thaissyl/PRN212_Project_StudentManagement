@@ -1,9 +1,9 @@
-﻿<Window x:Class="PRN212_Project_StudentManagement.Views.MainClassView"
+﻿<Window x:Class="PRN212_Project_StudentManagement.Views.MainManagerView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:PRN212_Project_StudentManagement.Views" mc:Ignorable="d" Title="Class Management" Height="450" Width="800">
+    xmlns:local="clr-namespace:PRN212_Project_StudentManagement.Views" mc:Ignorable="d" Title="Manager - Class Management" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -16,7 +16,9 @@
                 <DataGridTextColumn Header="Class ID" Binding="{Binding ClassId}" Width="Auto" />
                 <DataGridTextColumn Header="Class Name" Binding="{Binding ClassName}" Width="*" />
                 <DataGridTextColumn Header="Teacher Name" Binding="{Binding Teacher.User.FullName}" Width="*" />
-                <DataGridTextColumn Header="Academic Year" Binding="{Binding AcademicYear}" Width="*" />
+                <DataGridTextColumn Header="Subject Name" Binding="{Binding Teacher.Subject.SubjectName}" Width="*" />
+                <DataGridTextColumn Header="From Year" Binding="{Binding AcademicFromYear}" Width="*" />
+                <DataGridTextColumn Header="To Year" Binding="{Binding AcademicToYear}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
 
@@ -26,8 +28,10 @@
             <TextBox Text="{Binding ClassId, Mode=OneWay}" IsReadOnly="True" Margin="0,5,0,10" />
             <TextBlock Text="Class Name" />
             <TextBox Text="{Binding ClassName, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,10" />
-            <TextBlock Text="Academic Year" />
-            <TextBox Text="{Binding AcademicYear, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,10" />
+            <TextBlock Text="From Year" />
+            <TextBox Text="{Binding AcademicFromYear, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,10" />
+            <TextBlock Text="To Year" />
+            <TextBox Text="{Binding AcademicToYear, UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,10" />
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Add" Command="{Binding DataContext.AddClassCommand, RelativeSource={RelativeSource AncestorType=Window}}" Width="80" Margin="5" />
@@ -38,9 +42,8 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <Button Content="Refresh" Command="{Binding DataContext.RefreshCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                         Width="80" Margin="5" Foreground="White" />
-                <Button Content="Back" Command="{Binding DataContext.BackCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                        Width="80" Margin="5" Background="#6C757D" Foreground="White" />
+                <Button Content="Teacher" Command="{Binding DataContext.ShowTeacherInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}" Width="80" Margin="5" Background="Blue" Foreground="White" />
+                <Button Content="Subject" Command="{Binding DataContext.ShowSubjectInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}" Width="80" Margin="5" Background="Purple" Foreground="White" />
             </StackPanel>
         </StackPanel>
     </Grid>

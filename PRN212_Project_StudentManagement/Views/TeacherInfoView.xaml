@@ -1,0 +1,24 @@
+<Window x:Class="PRN212_Project_StudentManagement.Views.TeacherInfoView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Teacher Information" Height="400" Width="800" WindowStartupLocation="CenterScreen">
+    <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="150" />
+        </Grid.ColumnDefinitions>
+        <DataGrid ItemsSource="{Binding Teachers}" AutoGenerateColumns="False" CanUserAddRows="False" Grid.Column="0" SelectedItem="{Binding SelectedTeacher}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Full Name" Binding="{Binding User.FullName}" Width="*" />
+                <DataGridTextColumn Header="Email" Binding="{Binding User.Email}" Width="*" />
+                <DataGridTextColumn Header="Subject Name" Binding="{Binding Subject.SubjectName}" Width="*" />
+                <DataGridTextColumn Header="Hire Date" Binding="{Binding HireDate}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
+            <Button Content="Add" Command="{Binding AddTeacherCommand}" Margin="0,0,0,10" Height="40" />
+            <Button Content="Edit" Command="{Binding EditTeacherCommand}" Margin="0,0,0,10" Height="40" />
+            <Button Content="Delete" Command="{Binding DeleteTeacherCommand}" Height="40" />
+        </StackPanel>
+    </Grid>
+</Window> 

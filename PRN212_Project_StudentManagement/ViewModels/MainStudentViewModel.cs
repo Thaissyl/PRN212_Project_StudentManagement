@@ -110,7 +110,8 @@ namespace PRN212_Project_StudentManagement.ViewModels
                         {
                             ClassId = s.ClassId,
                             ClassName = s.Class.ClassName,
-                            AcademicYear = s.Class.AcademicYear,
+                            AcademicFromYear = s.Class.AcademicFromYear,
+                            AcademicToYear = s.Class.AcademicToYear,
                             TeacherName = s.Class.Teacher != null ? s.Class.Teacher.User.FullName : "No Teacher Assigned",
                             SubjectName = s.Class.Teacher != null ? s.Class.Teacher.Subject.SubjectName : "No Subject Assigned",
                             EnrollmentDate = s.EnrollmentDate

@@ -29,7 +29,12 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
 
         public List<Class> GetAllClasses()
         {
-            return _context.Classes.Include(c => c.Teacher).ThenInclude(t => t.User).ToList();
+            return _context.Classes
+                .Include(c => c.Teacher)
+                    .ThenInclude(t => t.User)
+                .Include(c => c.Teacher)
+                    .ThenInclude(t => t.Subject)
+                .ToList();
         }
 
         public void UpdateClass(Class selectedClass)
