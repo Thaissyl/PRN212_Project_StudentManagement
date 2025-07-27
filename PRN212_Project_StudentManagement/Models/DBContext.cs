@@ -136,12 +136,12 @@ public partial class DBContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Marks__StudentID__5AEE82B9");
 
-            entity.HasOne(d => d.Subject).WithMany()
+            entity.HasOne(d => d.Subject).WithMany(p => p.Marks)
                 .HasForeignKey(d => d.SubjectId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Marks__SubjectID__5BE2A6F2");
 
-            entity.HasOne(d => d.Class).WithMany()
+            entity.HasOne(d => d.Class).WithMany(p => p.Marks)
                 .HasForeignKey(d => d.ClassId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Marks__ClassID__5CD6CB2B");

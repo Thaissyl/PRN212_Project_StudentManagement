@@ -62,9 +62,14 @@ namespace PRN212_Project_StudentManagement.ViewModels
             {
                 _selectedStudentMark = value;
                 OnPropertyChanged(nameof(SelectedStudentMark));
+                OnPropertyChanged(nameof(IsViewing));
                 if (value != null)
                 {
                     LoadMarkDetails(value);
+                }
+                else
+                {
+                    ClearEditFields();
                 }
             }
         }
@@ -152,6 +157,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
             {
                 _isEditing = value;
                 OnPropertyChanged(nameof(IsEditing));
+                OnPropertyChanged(nameof(IsViewing));
             }
         }
 
@@ -162,6 +168,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
             {
                 _isAdding = value;
                 OnPropertyChanged(nameof(IsAdding));
+                OnPropertyChanged(nameof(IsViewing));
                 if (value)
                 {
                     LoadListsForAdd();
@@ -329,6 +336,8 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand AddCommand { get; }
         public ICommand AddNewMarkCommand { get; }
 
+        public bool IsViewing => SelectedStudentMark != null && !IsEditing && !IsAdding;
+
         public string TeacherFullName => _currentUser?.FullName;
 
         public StudentMarkViewModel(User currentUser)
@@ -468,6 +477,17 @@ namespace PRN212_Project_StudentManagement.ViewModels
             EditMark = mark.Mark;
             EditExamDate = mark.ExamDate;
             EditTeacherName = mark.TeacherName;
+        }
+
+        private void ClearEditFields()
+        {
+            EditStudentName = string.Empty;
+            EditClassName = string.Empty;
+            EditSubjectName = string.Empty;
+            EditSemesterName = string.Empty;
+            EditMark = 0;
+            EditExamDate = DateTime.Now;
+            EditTeacherName = string.Empty;
         }
 
         private void LoadListsForAdd()
@@ -668,4 +688,4 @@ namespace PRN212_Project_StudentManagement.ViewModels
             ExecuteSaveCommand(obj);
         }
     }
-} 
+}
