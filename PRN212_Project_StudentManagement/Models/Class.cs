@@ -12,7 +12,10 @@ public partial class Class
     public int? TeacherId { get; set; }
 
     public int AcademicFromYear { get; set; }
+
     public int AcademicToYear { get; set; }
+
+    public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 
     public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 

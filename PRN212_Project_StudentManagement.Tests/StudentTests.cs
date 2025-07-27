@@ -19,8 +19,6 @@ namespace PRN212_Project_StudentManagement.Tests
             Assert.Equal(0, student.ClassId);
             Assert.Equal(default(DateOnly), student.EnrollmentDate);
             Assert.NotNull(student.Class);
-            Assert.NotNull(student.StudentLogs);
-            Assert.IsType<List<StudentLog>>(student.StudentLogs);
             Assert.NotNull(student.User);
         }
     }

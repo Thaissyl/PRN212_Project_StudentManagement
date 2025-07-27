@@ -21,7 +21,5 @@ public partial class User
 
     public virtual Student? Student { get; set; }
 
-    public virtual ICollection<StudentLog> StudentLogs { get; set; } = new List<StudentLog>();
-
     public virtual Teacher? Teacher { get; set; }
 }

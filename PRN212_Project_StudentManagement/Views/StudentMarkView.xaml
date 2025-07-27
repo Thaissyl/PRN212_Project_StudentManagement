@@ -1,0 +1,523 @@
+<Window
+    x:Class="PRN212_Project_StudentManagement.Views.StudentMarkView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Student Marks Management"
+    Width="1400"
+    Height="700"
+    WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel - Student Marks List -->
+        <Grid Grid.Column="0" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel
+                Grid.Row="0"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center"
+                    FontWeight="Bold"
+                    Text="{Binding TeacherFullName}" />
+                <Button
+                    Width="80"
+                    Command="{Binding BackCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="Back" />
+            </StackPanel>
+
+            <!-- Search Bar -->
+            <Border
+                Grid.Row="1"
+                Margin="0,0,0,10"
+                Padding="15"
+                Background="#F8F9FA"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center"
+                        FontWeight="Bold"
+                        Text="Search Student:" />
+
+                    <TextBox
+                        Grid.Column="1"
+                        Margin="0,0,10,0"
+                        Padding="8,6"
+                        VerticalAlignment="Center"
+                        Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                        FontSize="14" />
+
+                    <Button
+                        Grid.Column="2"
+                        Width="80"
+                        Background="#007BFF"
+                        BorderBrush="Transparent"
+                        Command="{Binding AddCommand}"
+                        Content="Add New"
+                        FontWeight="Bold"
+                        Foreground="White" />
+                </Grid>
+            </Border>
+
+            <!-- Filter Controls -->
+            <StackPanel
+                Grid.Row="2"
+                Margin="0,0,0,10"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center"
+                    Text="Semester:" />
+                <ComboBox
+                    Width="120"
+                    Margin="0,0,15,0"
+                    ItemsSource="{Binding Semesters}"
+                    SelectedItem="{Binding SelectedSemester}" />
+
+                <TextBlock
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center"
+                    Text="Subject:" />
+                <ComboBox
+                    Width="120"
+                    Margin="0,0,15,0"
+                    ItemsSource="{Binding Subjects}"
+                    SelectedItem="{Binding SelectedSubject}" />
+
+                <TextBlock
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center"
+                    Text="Class:" />
+                <ComboBox
+                    Width="120"
+                    Margin="0,0,15,0"
+                    ItemsSource="{Binding Classes}"
+                    SelectedItem="{Binding SelectedClass}" />
+
+                <Button
+                    Width="80"
+                    Command="{Binding RefreshCommand}"
+                    Content="Refresh" />
+            </StackPanel>
+
+            <!-- Student Marks DataGrid -->
+            <DataGrid
+                Grid.Row="3"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                GridLinesVisibility="Horizontal"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                ItemsSource="{Binding StudentMarks}"
+                SelectedItem="{Binding SelectedStudentMark}"
+                Background="White"
+                BorderBrush="#E9ECEF"
+                BorderThickness="1"
+                RowBackground="White"
+                AlternatingRowBackground="#F8F9FA"
+                HorizontalGridLinesBrush="#E9ECEF"
+                VerticalGridLinesBrush="Transparent">
+
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#007BFF" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Padding" Value="10,8" />
+                        <Setter Property="BorderBrush" Value="#0056B3" />
+                        <Setter Property="BorderThickness" Value="0,0,1,0" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding StudentName}"
+                        Header="Student Name">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="Foreground" Value="#495057" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="100"
+                        Binding="{Binding ClassName}"
+                        Header="Class">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Foreground" Value="#007BFF" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding SubjectName}"
+                        Header="Subject">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="Foreground" Value="#6F42C1" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="100"
+                        Binding="{Binding SemesterName}"
+                        Header="Semester">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Foreground" Value="#28A745" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="80"
+                        Binding="{Binding Mark, StringFormat=F2}"
+                        Header="Mark">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="FontSize" Value="14" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="100"
+                        Binding="{Binding ExamDate, StringFormat=dd/MM/yyyy}"
+                        Header="Exam Date">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Foreground" Value="#6C757D" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding TeacherName}"
+                        Header="Teacher">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Padding" Value="10,8" />
+                                <Setter Property="Foreground" Value="#28A745" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="BorderBrush" Value="#E9ECEF" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Mark}" Value="0">
+                                <Setter Property="Background" Value="#F8D7DA" />
+                                <Setter Property="Foreground" Value="#721C24" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Mark}" Value="10">
+                                <Setter Property="Background" Value="#D4EDDA" />
+                                <Setter Property="Foreground" Value="#155724" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Mark}" Value="8">
+                                <Setter Property="Background" Value="#D1ECF1" />
+                                <Setter Property="Foreground" Value="#0C5460" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+        </Grid>
+
+        <!-- Right Panel - Details -->
+        <Border
+            Grid.Column="1"
+            Background="#F8F9FA"
+            CornerRadius="8"
+            Padding="15">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Details Header -->
+                    <TextBlock
+                        Margin="0,0,0,20"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Text="Mark Details" />
+
+                    <!-- Edit Mode -->
+                    <Border
+                        Margin="0,0,0,20"
+                        Padding="15"
+                        Background="White"
+                        CornerRadius="6"
+                        Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="Edit Mark" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Student:" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditStudentName}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Class:" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditClassName}" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Subject:" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditSubjectName}" />
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Semester:" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditSemesterName}" />
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Mark:" />
+                                <TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditMark, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Exam Date:" />
+                                <DatePicker Grid.Row="5" Grid.Column="1" Margin="0,0,0,5" SelectedDate="{Binding EditExamDate}" />
+
+                                <TextBlock Grid.Row="6" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Teacher:" />
+                                <TextBlock Grid.Row="6" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditTeacherName}" />
+
+                                <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,15,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <Button
+                                        Width="70"
+                                        Margin="0,0,10,0"
+                                        Background="#28A745"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding SaveCommand}"
+                                        Content="Save"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                    <Button
+                                        Width="70"
+                                        Background="#6C757D"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding CancelCommand}"
+                                        Content="Cancel"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Add Mode -->
+                    <Border
+                        Margin="0,0,0,20"
+                        Padding="15"
+                        Background="White"
+                        CornerRadius="6"
+                        Visibility="{Binding IsAdding, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="Add New Mark" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Student:" />
+                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,5" 
+                                         ItemsSource="{Binding StudentList}" 
+                                         SelectedItem="{Binding SelectedStudentForAdd}"
+                                         DisplayMemberPath="FullName" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Class:" />
+                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" 
+                                         ItemsSource="{Binding ClassList}" 
+                                         SelectedItem="{Binding SelectedClassForAdd}"
+                                         DisplayMemberPath="ClassName" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Subject:" />
+                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" 
+                                         ItemsSource="{Binding SubjectList}" 
+                                         SelectedItem="{Binding SelectedSubjectForAdd}"
+                                         DisplayMemberPath="SubjectName" />
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Semester:" />
+                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" 
+                                         ItemsSource="{Binding SemesterList}" 
+                                         SelectedItem="{Binding SelectedSemesterForAdd}"
+                                         DisplayMemberPath="SemesterName" />
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Mark:" />
+                                <TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditMark, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Exam Date:" />
+                                <DatePicker Grid.Row="5" Grid.Column="1" Margin="0,0,0,5" SelectedDate="{Binding EditExamDate}" />
+
+                                <StackPanel Grid.Row="6" Grid.Column="1" Margin="0,15,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <Button
+                                        Width="70"
+                                        Margin="0,0,10,0"
+                                        Background="#28A745"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding AddNewMarkCommand}"
+                                        Content="Add"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                    <Button
+                                        Width="70"
+                                        Background="#6C757D"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding CancelCommand}"
+                                        Content="Cancel"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- View Mode -->
+                    <Border
+                        Margin="0,0,0,20"
+                        Padding="15"
+                        Background="White"
+                        CornerRadius="6"
+                        Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Text="Mark Information" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Student:" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditStudentName}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Class:" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditClassName}" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Subject:" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditSubjectName}" />
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Semester:" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditSemesterName}" />
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Mark:" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" Margin="0,0,0,5" FontWeight="Bold" FontSize="16" Text="{Binding EditMark, StringFormat=F2}" />
+
+                                <TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Exam Date:" />
+                                <TextBlock Grid.Row="5" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditExamDate, StringFormat=dd/MM/yyyy}" />
+
+                                <TextBlock Grid.Row="6" Grid.Column="0" Margin="0,0,10,5" FontWeight="Bold" Text="Teacher:" />
+                                <TextBlock Grid.Row="6" Grid.Column="1" Margin="0,0,0,5" Text="{Binding EditTeacherName}" />
+
+                                <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,15,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <Button
+                                        Width="70"
+                                        Margin="0,0,10,0"
+                                        Background="#007BFF"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding EditCommand}"
+                                        Content="Edit"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                    <Button
+                                        Width="70"
+                                        Background="#DC3545"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding DeleteCommand}"
+                                        Content="Delete"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- No Selection Message -->
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontStyle="Italic"
+                        Foreground="#6C757D"
+                        Text="Select a mark from the list to view details"
+                        Visibility="{Binding SelectedStudentMark, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window> 

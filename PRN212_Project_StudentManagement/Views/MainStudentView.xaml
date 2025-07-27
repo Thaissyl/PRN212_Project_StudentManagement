@@ -7,8 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:PRN212_Project_StudentManagement.ViewModels"
     Title="Student Dashboard"
-    Width="1000"
-    Height="600"
+    Width="1200"
+    Height="800"
     AllowsTransparency="True"
     Background="Transparent"
     WindowStartupLocation="CenterScreen"
@@ -67,9 +67,12 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!--  Student Information  -->
+                    <!--  Student Information & Profile Editing  -->
                     <Border
                         Grid.Row="0"
                         Margin="0,0,0,20"
@@ -77,13 +80,34 @@
                         Background="#F8F9FA"
                         CornerRadius="8">
                         <StackPanel>
-                            <TextBlock
-                                Margin="0,0,0,15"
-                                FontSize="20"
-                                FontWeight="Bold"
-                                Text="Student Information" />
-
                             <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Margin="0,0,0,15"
+                                    FontSize="20"
+                                    FontWeight="Bold"
+                                    Text="Student Information" />
+
+                                <Button
+                                    Grid.Column="1"
+                                    Width="100"
+                                    Height="30"
+                                    Background="#28A745"
+                                    BorderBrush="Transparent"
+                                    Command="{Binding EditProfileCommand}"
+                                    Content="Edit Profile"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Visibility="{Binding IsEditingProfile, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                            </Grid>
+
+                            <!--  View Mode  -->
+                            <Grid Visibility="{Binding IsEditingProfile, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -130,12 +154,183 @@
                                     Margin="0,0,0,5"
                                     Text="{Binding CurrentUser.Role}" />
                             </Grid>
+
+                            <!--  Edit Mode  -->
+                            <Grid Visibility="{Binding IsEditingProfile, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,5"
+                                    FontWeight="Bold"
+                                    Text="Name:" />
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="0,0,0,5"
+                                    Text="{Binding EditFullName, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,0,10,5"
+                                    FontWeight="Bold"
+                                    Text="Email:" />
+                                <TextBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0,0,0,5"
+                                    Text="{Binding EditEmail, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <StackPanel
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Margin="0,10,0,0"
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal">
+                                    <Button
+                                        Width="80"
+                                        Margin="0,0,10,0"
+                                        Background="#28A745"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding SaveProfileCommand}"
+                                        Content="Save"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                    <Button
+                                        Width="80"
+                                        Background="#6C757D"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding CancelEditCommand}"
+                                        Content="Cancel"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </Border>
 
-                    <!--  Classes Information  -->
+                    <!--  Academic Performance Summary  -->
                     <Border
                         Grid.Row="1"
+                        Margin="0,0,0,20"
+                        Padding="20"
+                        Background="#E3F2FD"
+                        CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,15"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Text="Academic Performance Summary" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Grid.Column="0"
+                                    Margin="5"
+                                    Padding="15"
+                                    Background="White"
+                                    CornerRadius="6">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Text="Semester 1 Average" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="24"
+                                            FontWeight="Bold"
+                                            Foreground="#007BFF"
+                                            Text="{Binding AverageMarkSemester1, StringFormat=F2}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    Padding="15"
+                                    Background="White"
+                                    CornerRadius="6">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Text="Semester 2 Average" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="24"
+                                            FontWeight="Bold"
+                                            Foreground="#007BFF"
+                                            Text="{Binding AverageMarkSemester2, StringFormat=F2}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    Padding="15"
+                                    Background="White"
+                                    CornerRadius="6">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Text="Yearly Average" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="24"
+                                            FontWeight="Bold"
+                                            Foreground="#28A745"
+                                            Text="{Binding YearlyAverage, StringFormat=F2}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    Padding="15"
+                                    Background="White"
+                                    CornerRadius="6">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Text="Academic Level" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            FontSize="20"
+                                            FontWeight="Bold"
+                                            Foreground="#DC3545"
+                                            Text="{Binding AcademicPerformance}" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!--  My Classes  -->
+                    <Border
+                        Grid.Row="2"
                         Margin="0,0,0,20"
                         Padding="20"
                         Background="#F8F9FA"
@@ -240,9 +435,181 @@
                         </StackPanel>
                     </Border>
 
+                    <!--  My Marks  -->
+                    <Border
+                        Grid.Row="3"
+                        Margin="0,0,0,20"
+                        Padding="20"
+                        Background="#F8F9FA"
+                        CornerRadius="8">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="20"
+                                    FontWeight="Bold"
+                                    Text="My Marks" />
+
+                                <StackPanel
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        Margin="0,0,10,0"
+                                        VerticalAlignment="Center"
+                                        FontWeight="Bold"
+                                        Text="Filter by Semester:" />
+                                    <ComboBox
+                                        Width="120"
+                                        Margin="0,0,10,0"
+                                        ItemsSource="{Binding SemesterFilters}"
+                                        SelectedItem="{Binding SelectedSemesterFilter}" />
+                                    <Button
+                                        Width="80"
+                                        Background="#007BFF"
+                                        BorderBrush="Transparent"
+                                        Command="{Binding ClearFilterCommand}"
+                                        Content="Clear"
+                                        FontWeight="Bold"
+                                        Foreground="White" />
+                                </StackPanel>
+                            </Grid>
+
+                            <DataGrid
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                GridLinesVisibility="Horizontal"
+                                HeadersVisibility="Column"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding FilteredStudentMarks}"
+                                SelectedItem="{Binding SelectedMark}"
+                                Background="White"
+                                BorderBrush="#E9ECEF"
+                                BorderThickness="1"
+                                RowBackground="White"
+                                AlternatingRowBackground="#F8F9FA"
+                                HorizontalGridLinesBrush="#E9ECEF"
+                                VerticalGridLinesBrush="Transparent">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#007BFF" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Padding" Value="10,8" />
+                                        <Setter Property="BorderBrush" Value="#0056B3" />
+                                        <Setter Property="BorderThickness" Value="0,0,1,0" />
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="150"
+                                        Binding="{Binding SubjectName}"
+                                        Header="Subject">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Padding" Value="10,8" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Setter Property="Foreground" Value="#495057" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        Width="120"
+                                        Binding="{Binding SemesterName}"
+                                        Header="Semester">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Padding" Value="10,8" />
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Setter Property="Foreground" Value="#007BFF" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        Width="100"
+                                        Binding="{Binding Mark, StringFormat=F2}"
+                                        Header="Mark">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Padding" Value="10,8" />
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="FontWeight" Value="Bold" />
+                                                <Setter Property="FontSize" Value="14" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        Width="120"
+                                        Binding="{Binding ExamDate, StringFormat=dd/MM/yyyy}"
+                                        Header="Exam Date">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Padding" Value="10,8" />
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="Foreground" Value="#6C757D" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        Width="180"
+                                        Binding="{Binding TeacherName}"
+                                        Header="Teacher">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Padding" Value="10,8" />
+                                                <Setter Property="Foreground" Value="#28A745" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="BorderBrush" Value="#E9ECEF" />
+                                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Mark}" Value="0">
+                                                <Setter Property="Background" Value="#F8D7DA" />
+                                                <Setter Property="Foreground" Value="#721C24" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Mark}" Value="10">
+                                                <Setter Property="Background" Value="#D4EDDA" />
+                                                <Setter Property="Foreground" Value="#155724" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Mark}" Value="8">
+                                                <Setter Property="Background" Value="#D1ECF1" />
+                                                <Setter Property="Foreground" Value="#0C5460" />
+                                            </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Mark}" Value="0" />
+                                                    <Condition Binding="{Binding Mark}" Value="10" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
+                            </DataGrid>
+
+                            <!--  No Marks Message  -->
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontStyle="Italic"
+                                Foreground="#6C757D"
+                                Text="No marks available yet."
+                                Visibility="{Binding FilteredStudentMarks.Count, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+                        </StackPanel>
+                    </Border>
+
                     <!--  Action Buttons  -->
                     <StackPanel
-                        Grid.Row="2"
+                        Grid.Row="4"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
@@ -253,7 +620,7 @@
                             Background="#28A745"
                             BorderBrush="Transparent"
                             Command="{Binding ViewProfileCommand}"
-                            Content="View Profile"
+                            Content="View Full Profile"
                             Cursor="Hand"
                             FontWeight="Bold"
                             Foreground="White" />

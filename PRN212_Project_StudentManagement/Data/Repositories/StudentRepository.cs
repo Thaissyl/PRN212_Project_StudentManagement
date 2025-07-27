@@ -1,6 +1,7 @@
 using PRN212_Project_StudentManagement.Data.Interfaces;
 using PRN212_Project_StudentManagement.DTOs;
 using PRN212_Project_StudentManagement.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace PRN212_Project_StudentManagement.Data.Repositories
 {
@@ -169,6 +170,36 @@ namespace PRN212_Project_StudentManagement.Data.Repositories
                 }
 
                 context.SaveChanges();
+            }
+        }
+
+        public IEnumerable<Mark> GetStudentMarks(int studentId)
+        {
+            using (var context = new DBContext())
+            {
+                return context.Marks.Where(m => m.StudentId == studentId).ToList();
+            }
+        }
+
+        public IEnumerable<StudentMarkDTO> GetStudentMarksWithSubjects(int studentId)
+        {
+            using (var context = new DBContext())
+            {
+                var marks = from m in context.Marks
+                           join s in context.Subjects on m.SubjectId equals s.SubjectId
+                           where m.StudentId == studentId
+                           select new StudentMarkDTO
+                           {
+                               MarkId = m.MarkId,
+                               StudentId = m.StudentId,
+                               SubjectId = m.SubjectId,
+                               SubjectName = s.SubjectName,
+                               ClassId = m.ClassId,
+                               SemesterId = m.SemesterId,
+                               Mark1 = m.Mark1,
+                               ExamDate = m.ExamDate
+                           };
+                return marks.ToList();
             }
         }
     }

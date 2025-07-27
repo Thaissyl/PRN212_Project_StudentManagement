@@ -15,7 +15,7 @@ public partial class Student
 
     public virtual Class Class { get; set; } = null!;
 
-    public virtual ICollection<StudentLog> StudentLogs { get; set; } = new List<StudentLog>();
+    public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 
     public virtual User User { get; set; } = null!;
 }

@@ -17,13 +17,13 @@ public partial class DBContext : DbContext
 
     public virtual DbSet<Class> Classes { get; set; }
 
-    public virtual DbSet<Department> Departments { get; set; }
-
     public virtual DbSet<Manager> Managers { get; set; }
 
     public virtual DbSet<Student> Students { get; set; }
 
-    public virtual DbSet<StudentLog> StudentLogs { get; set; }
+    public virtual DbSet<Mark> Marks { get; set; }
+
+    public virtual DbSet<Semester> Semesters { get; set; }
 
     public virtual DbSet<Subject> Subjects { get; set; }
 
@@ -52,16 +52,6 @@ public partial class DBContext : DbContext
                 .HasConstraintName("FK__Classes__Teacher__4BAC3F29");
         });
 
-        modelBuilder.Entity<Department>(entity =>
-        {
-            entity.HasKey(e => e.DepartmentId).HasName("PK__Departme__B2079BCDEEC695D9");
-
-            entity.HasIndex(e => e.DepartmentName, "UQ__Departme__D949CC34B9B1CEDB").IsUnique();
-
-            entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
-            entity.Property(e => e.DepartmentName).HasMaxLength(50);
-        });
-
         modelBuilder.Entity<Manager>(entity =>
         {
             entity.HasKey(e => e.ManagerId).HasName("PK__Managers__3BA2AA8116532A31");
@@ -69,13 +59,7 @@ public partial class DBContext : DbContext
             entity.HasIndex(e => e.UserId, "UQ__Managers__1788CCAD81D5B89E").IsUnique();
 
             entity.Property(e => e.ManagerId).HasColumnName("ManagerID");
-            entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
             entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.Department).WithMany(p => p.Managers)
-                .HasForeignKey(d => d.DepartmentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Managers__Depart__440B1D61");
 
             entity.HasOne(d => d.User).WithOne(p => p.Manager)
                 .HasForeignKey<Manager>(d => d.UserId)
@@ -102,32 +86,6 @@ public partial class DBContext : DbContext
                 .HasForeignKey<Student>(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Students__UserID__4F7CD00D");
-        });
-
-        modelBuilder.Entity<StudentLog>(entity =>
-        {
-            entity.HasKey(e => e.LogId).HasName("PK__StudentL__5E5499A8E07ABA01");
-
-            entity.Property(e => e.LogId).HasColumnName("LogID");
-            entity.Property(e => e.Action).HasMaxLength(50);
-            entity.Property(e => e.ActionDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ChangeById).HasColumnName("ChangeByID");
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.NewData).HasMaxLength(1000);
-            entity.Property(e => e.OldData).HasMaxLength(1000);
-            entity.Property(e => e.StudentId).HasColumnName("StudentID");
-
-            entity.HasOne(d => d.ChangeBy).WithMany(p => p.StudentLogs)
-                .HasForeignKey(d => d.ChangeById)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StudentLo__Chang__5535A963");
-
-            entity.HasOne(d => d.Student).WithMany(p => p.StudentLogs)
-                .HasForeignKey(d => d.StudentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StudentLo__Stude__5441852A");
         });
 
         modelBuilder.Entity<Subject>(entity =>
@@ -159,6 +117,48 @@ public partial class DBContext : DbContext
                 .HasForeignKey<Teacher>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Teachers__UserID__47DBAE45");
+        });
+
+        modelBuilder.Entity<Mark>(entity =>
+        {
+            entity.HasKey(e => e.MarkId).HasName("PK__Marks__4A4E74C8F1B5E3E7");
+
+            entity.Property(e => e.MarkId).HasColumnName("MarkID");
+            entity.Property(e => e.StudentId).HasColumnName("StudentID");
+            entity.Property(e => e.SubjectId).HasColumnName("SubjectID");
+            entity.Property(e => e.ClassId).HasColumnName("ClassID");
+            entity.Property(e => e.SemesterId).HasColumnName("SemesterID");
+            entity.Property(e => e.Mark1).HasColumnName("Mark");
+            entity.Property(e => e.ExamDate).HasColumnType("date");
+
+            entity.HasOne(d => d.Student).WithMany(p => p.Marks)
+                .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Marks__StudentID__5AEE82B9");
+
+            entity.HasOne(d => d.Subject).WithMany()
+                .HasForeignKey(d => d.SubjectId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Marks__SubjectID__5BE2A6F2");
+
+            entity.HasOne(d => d.Class).WithMany()
+                .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Marks__ClassID__5CD6CB2B");
+
+            entity.HasOne(d => d.Semester).WithMany(p => p.Marks)
+                .HasForeignKey(d => d.SemesterId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Marks__Semester__5DCAEF64");
+        });
+
+        modelBuilder.Entity<Semester>(entity =>
+        {
+            entity.HasKey(e => e.SemesterId).HasName("PK__Semester__C1DEB3B9F2B5E3E7");
+
+            entity.Property(e => e.SemesterId).HasColumnName("SemesterID");
+            entity.Property(e => e.SemesterName).HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(200);
         });
 
         modelBuilder.Entity<User>(entity =>

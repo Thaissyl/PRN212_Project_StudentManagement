@@ -9,11 +9,7 @@ public partial class Manager
 
     public int UserId { get; set; }
 
-    public int DepartmentId { get; set; }
-
-    public DateOnly HireDate { get; set; }
-
-    public virtual Department Department { get; set; } = null!;
+    public DateOnly StartDate { get; set; }
 
     public virtual User User { get; set; } = null!;
 }

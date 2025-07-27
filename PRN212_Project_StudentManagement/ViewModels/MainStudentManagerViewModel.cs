@@ -92,7 +92,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand SearchCommand { get; }
         public ICommand ResetCommand { get; }
         public ICommand DeleteCommand { get; }
-        public ICommand NavigateToClassViewCommand { get; }
+        public ICommand NavigateToMarkViewCommand { get; }
         public ICommand SaveNewStudentCommand { get; }
         public ICommand CancelAddCommand { get; }
         public ICommand AssignStudentCommand { get; }
@@ -178,6 +178,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
             AssignStudentCommand = new ViewModelCommand(ExecuteAssignStudentCommand, CanExecuteAssignStudentCommand);
             CancelAssignCommand = new ViewModelCommand(ExecuteCancelAssignCommand);
             AssignCommand = new ViewModelCommand(ExecuteAssignCommand);
+            NavigateToMarkViewCommand = new ViewModelCommand(ExecuteNavigateToMarkViewCommand);
             NewStudent = new StudentDTO();
             UnassignedStudents = new ObservableCollection<StudentDTO>();
             LoadStudents();
@@ -213,8 +214,96 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void LoadStudents()
         {
             _allStudents = new ObservableCollection<StudentDTO>(_studentRepository.GetAllStudents());
+            
+            // Calculate average marks for each student
+            foreach (var student in _allStudents)
+            {
+                CalculateStudentAverageMarks(student);
+            }
+            
             Students = new ObservableCollection<StudentDTO>(_allStudents);
             DebugSearch("Loaded " + _allStudents.Count + " students.");
+        }
+
+        private void CalculateStudentAverageMarks(StudentDTO student)
+        {
+            try
+            {
+                // Get marks for the student with subject information
+                var studentMarks = _studentRepository.GetStudentMarksWithSubjects(student.StudentID);
+                
+                // Calculate semester 1 average - group by subject and calculate average per subject
+                var semester1Marks = studentMarks.Where(m => m.SemesterId == 1).ToList();
+                if (semester1Marks.Any())
+                {
+                    // Group by subject to get average per subject
+                    var semester1SubjectAverages = semester1Marks
+                        .GroupBy(m => m.SubjectId)
+                        .Select(g => g.Average(m => m.Mark1))
+                        .ToList();
+                    
+                    // Calculate overall semester 1 average (sum of all subject averages / number of subjects)
+                    student.AverageMarkSemester1 = semester1SubjectAverages.Average();
+                    
+                    System.Diagnostics.Debug.WriteLine($"Student {student.StudentID} Semester 1: {string.Join(", ", semester1Marks.Select(m => $"{m.SubjectName}={m.Mark1:F1}"))} -> Average = {student.AverageMarkSemester1:F2}");
+                }
+                else
+                {
+                    student.AverageMarkSemester1 = 0;
+                }
+
+                // Calculate semester 2 average - group by subject and calculate average per subject
+                var semester2Marks = studentMarks.Where(m => m.SemesterId == 2).ToList();
+                if (semester2Marks.Any())
+                {
+                    // Group by subject to get average per subject
+                    var semester2SubjectAverages = semester2Marks
+                        .GroupBy(m => m.SubjectId)
+                        .Select(g => g.Average(m => m.Mark1))
+                        .ToList();
+                    
+                    // Calculate overall semester 2 average (sum of all subject averages / number of subjects)
+                    student.AverageMarkSemester2 = semester2SubjectAverages.Average();
+                    
+                    System.Diagnostics.Debug.WriteLine($"Student {student.StudentID} Semester 2: {string.Join(", ", semester2Marks.Select(m => $"{m.SubjectName}={m.Mark1:F1}"))} -> Average = {student.AverageMarkSemester2:F2}");
+                }
+                else
+                {
+                    student.AverageMarkSemester2 = 0;
+                }
+
+                // Calculate yearly average: (Semester1 + Semester2 * 2) / 3
+                student.YearlyAverage = (student.AverageMarkSemester1 + student.AverageMarkSemester2 * 2) / 3;
+
+                // Determine academic performance
+                student.AcademicPerformance = DetermineAcademicPerformance(student.YearlyAverage);
+                
+                System.Diagnostics.Debug.WriteLine($"Student {student.StudentID}: Semester1={student.AverageMarkSemester1:F2}, Semester2={student.AverageMarkSemester2:F2}, Yearly={student.YearlyAverage:F2}, Performance={student.AcademicPerformance}");
+                System.Diagnostics.Debug.WriteLine($"Yearly calculation: ({student.AverageMarkSemester1:F2} + {student.AverageMarkSemester2:F2} × 2) ÷ 3 = {student.YearlyAverage:F2}");
+            }
+            catch (Exception ex)
+            {
+                // Set default values if calculation fails
+                student.AverageMarkSemester1 = 0;
+                student.AverageMarkSemester2 = 0;
+                student.YearlyAverage = 0;
+                student.AcademicPerformance = "N/A";
+                System.Diagnostics.Debug.WriteLine($"Error calculating marks for student {student.StudentID}: {ex.Message}");
+            }
+        }
+
+        private string DetermineAcademicPerformance(double yearlyAverage)
+        {
+            if (yearlyAverage >= 8.0)
+                return "Giỏi";
+            else if (yearlyAverage >= 6.5)
+                return "Khá";
+            else if (yearlyAverage >= 3.5)
+                return "Trung Bình";
+            else if (yearlyAverage >= 0)
+                return "Yếu";
+            else
+                return "N/A";
         }
 
         private void LoadClassNames()
@@ -258,7 +347,15 @@ namespace PRN212_Project_StudentManagement.ViewModels
                 filteredStudents = filteredStudents.Where(s => s.ClassName == SelectedClassFilter);
             }
 
-            Students = new ObservableCollection<StudentDTO>(filteredStudents.ToList());
+            var filteredList = filteredStudents.ToList();
+            
+            // Recalculate average marks for filtered students
+            foreach (var student in filteredList)
+            {
+                CalculateStudentAverageMarks(student);
+            }
+            
+            Students = new ObservableCollection<StudentDTO>(filteredList);
             DebugSearch("Found " + Students.Count + " matching students.");
         }
 
@@ -268,6 +365,13 @@ namespace PRN212_Project_StudentManagement.ViewModels
             SearchStudentId = string.Empty;
             SelectedClassFilter = "All Classes";
             SelectedStudent = null; // Reset the selected student to clear details
+            
+            // Recalculate average marks for all students
+            foreach (var student in _allStudents)
+            {
+                CalculateStudentAverageMarks(student);
+            }
+            
             Students = new ObservableCollection<StudentDTO>(_allStudents);
             DebugSearch("Reset applied, showing all students and cleared details.");
         }
@@ -383,6 +487,13 @@ namespace PRN212_Project_StudentManagement.ViewModels
             IsAddingNewStudent = false;
             IsAssigningStudent = true;
             SelectedStudent = null; // Clear any selected student
+        }
+
+        private void ExecuteNavigateToMarkViewCommand(object obj)
+        {
+            var studentMarkViewModel = new StudentMarkViewModel(_currentUser);
+            var studentMarkView = new Views.StudentMarkView(studentMarkViewModel);
+            studentMarkView.Show();
         }
     }
 }

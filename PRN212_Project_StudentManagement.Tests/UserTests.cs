@@ -21,8 +21,6 @@ namespace PRN212_Project_StudentManagement.Tests
             Assert.False(user.IsActive);
             Assert.Null(user.Manager);
             Assert.Null(user.Student);
-            Assert.NotNull(user.StudentLogs);
-            Assert.IsType<List<StudentLog>>(user.StudentLogs);
             Assert.Null(user.Teacher);
         }
     }

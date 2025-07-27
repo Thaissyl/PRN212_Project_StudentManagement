@@ -1,4 +1,5 @@
 using PRN212_Project_StudentManagement.DTOs;
+using PRN212_Project_StudentManagement.Models;
 using System.Collections.Generic;
 
 namespace PRN212_Project_StudentManagement.Data.Interfaces
@@ -12,5 +13,7 @@ namespace PRN212_Project_StudentManagement.Data.Interfaces
         void DeleteStudent(int studentId);
         IEnumerable<StudentDTO> GetUnassignedStudents();
         void AssignStudentToClass(int studentId, string className);
+        IEnumerable<Mark> GetStudentMarks(int studentId);
+        IEnumerable<StudentMarkDTO> GetStudentMarksWithSubjects(int studentId);
     }
 }
