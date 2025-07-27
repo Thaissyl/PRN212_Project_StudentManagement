@@ -1,3 +1,4 @@
+using PRN212_Project_StudentManagement.Data.Interfaces;
 using PRN212_Project_StudentManagement.Data.Repositories;
 using PRN212_Project_StudentManagement.Models;
 using PRN212_Project_StudentManagement.Views;
@@ -33,21 +34,32 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand EditSubjectCommand { get; }
         public ICommand DeleteSubjectCommand { get; }
 
-        public SubjectInfoViewModel()
+        private readonly ISubjectRepository _repository;
+
+        public SubjectInfoViewModel(ISubjectRepository repository)
         {
+            _repository = repository;
             LoadSubjects();
             AddSubjectCommand = new ViewModelCommand(ExecuteAddSubjectCommand);
             EditSubjectCommand = new ViewModelCommand(ExecuteEditSubjectCommand, CanExecuteEditOrDeleteSubject);
             DeleteSubjectCommand = new ViewModelCommand(ExecuteDeleteSubjectCommand, CanExecuteEditOrDeleteSubject);
         }
 
-        private void LoadSubjects()
+        public SubjectInfoViewModel()
         {
-            var repo = new SubjectRepository();
-            var list = repo.GetAllSubjects().Select((s, i) => new SubjectViewModel { Index = i + 1, SubjectId = s.SubjectId, SubjectName = s.SubjectName }).ToList();
-            Subjects = new ObservableCollection<SubjectViewModel>(list);
         }
 
+        private void LoadSubjects()
+        {
+            var list = _repository.GetAllSubjects()
+                .Select((s, i) => new SubjectViewModel
+                {
+                    Index = i + 1,
+                    SubjectId = s.SubjectId,
+                    SubjectName = s.SubjectName
+                }).ToList();
+            Subjects = new ObservableCollection<SubjectViewModel>(list);
+        }
         private void ExecuteAddSubjectCommand(object obj)
         {
             var addSubjectView = new AddSubjectView();
