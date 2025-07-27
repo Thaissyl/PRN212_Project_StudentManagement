@@ -1,12 +1,17 @@
-using PRN212_Project_StudentManagement.Data.Repositories;
-using PRN212_Project_StudentManagement.Models;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using PRN212_Project_StudentManagement.Data.Interfaces;
+using PRN212_Project_StudentManagement.Data.Repositories;
+using PRN212_Project_StudentManagement.Models;
 
 namespace PRN212_Project_StudentManagement.ViewModels
 {
     public class TeacherInfoViewModel : ViewModelBase
     {
+        private readonly ITeacherRepository _repository;
+        private readonly IMessageBoxService _messageBoxService;
+
         private ObservableCollection<Teacher> _teachers;
         public ObservableCollection<Teacher> Teachers
         {
@@ -23,20 +28,36 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public ICommand AddTeacherCommand { get; }
         public ICommand EditTeacherCommand { get; }
         public ICommand DeleteTeacherCommand { get; }
-
-        public TeacherInfoViewModel()
+        private bool _isTest;
+        public TeacherInfoViewModel(ITeacherRepository repository, IMessageBoxService messageBoxService, bool isTest = false)
         {
-            Teachers = new ObservableCollection<Teacher>(new TeacherRepository().GetAllTeachers());
+            _repository = repository;
+            _messageBoxService = messageBoxService;
+            _isTest = isTest;
+            Teachers = new ObservableCollection<Teacher>(_repository.GetAllTeachers());
+
             AddTeacherCommand = new ViewModelCommand(ExecuteAddTeacherCommand);
             EditTeacherCommand = new ViewModelCommand(ExecuteEditTeacherCommand, CanExecuteEditOrDeleteTeacher);
             DeleteTeacherCommand = new ViewModelCommand(ExecuteDeleteTeacherCommand, CanExecuteEditOrDeleteTeacher);
         }
 
+        public TeacherInfoViewModel()
+        {
+        }
+
+        private void LoadTeachers()
+        {
+            Teachers = new ObservableCollection<Teacher>(_repository.GetAllTeachers());
+        }
         private void ExecuteAddTeacherCommand(object obj)
         {
-            var addTeacherView = new Views.AddTeacherView();
-            addTeacherView.ShowDialog();
-            Teachers = new ObservableCollection<Teacher>(new TeacherRepository().GetAllTeachers());
+            if (!_isTest)
+            {
+                var addTeacherView = new Views.AddTeacherView();
+                addTeacherView.ShowDialog();
+            }
+
+            LoadTeachers(); // vẫn chạy bình thường
         }
         private bool CanExecuteEditOrDeleteTeacher(object obj)
         {
@@ -52,11 +73,17 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void ExecuteDeleteTeacherCommand(object obj)
         {
             if (SelectedTeacher == null) return;
-            if (System.Windows.MessageBox.Show($"Are you sure you want to delete teacher {SelectedTeacher.User.FullName}?", "Confirm Delete", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes)
+
+            bool confirm = _messageBoxService.ConfirmDelete(
+                $"Are you sure you want to delete teacher {SelectedTeacher.User.FullName}?"
+            );
+
+            if (confirm)
             {
-                new TeacherRepository().DeleteTeacher(SelectedTeacher.TeacherId);
-                Teachers = new ObservableCollection<Teacher>(new TeacherRepository().GetAllTeachers());
+                _repository.DeleteTeacher(SelectedTeacher.TeacherId);
+                LoadTeachers();
             }
+
         }
     }
-} 
+}

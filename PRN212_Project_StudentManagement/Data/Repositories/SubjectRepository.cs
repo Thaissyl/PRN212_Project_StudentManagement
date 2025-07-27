@@ -1,10 +1,11 @@
+using PRN212_Project_StudentManagement.Data.Interfaces;
 using PRN212_Project_StudentManagement.Models;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace PRN212_Project_StudentManagement.Data.Repositories
 {
-    public class SubjectRepository
+    public class SubjectRepository : ISubjectRepository
     {
         public List<Subject> GetAllSubjects()
         {
