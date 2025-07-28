@@ -58,51 +58,72 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void ExecuteLoginCommand(object parameter)
         {
+            string password = string.Empty;
+
             if (parameter is PasswordBox passwordBox)
             {
-                string password = passwordBox.Password;
+                password = passwordBox.Password;
+            }
+            else if (parameter is string p)
+            {
+                password = p;
+            }
 
-                if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(password))
+            {
+                ErrorMessage = "Email and password cannot be empty.";
+                return;
+            }
+
+            var user = _loginService.Authenticate(Email, password);
+
+            if (user != null)
+            {
+                if (!user.IsActive)
                 {
-                    ErrorMessage = "Email and password cannot be empty.";
+                    ErrorMessage = "Your account is inactive. Please contact support.";
                     return;
                 }
 
-                var user = _loginService.Authenticate(Email, password);
+                switch (user.Role)
+                {
+                    case "Teacher":
+                    case "Student":
+                    case "Manager":
+                        if (Application.Current != null)
+                        {
+                            Window currentWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.IsActive);
 
-                if (user != null)
-                {
-                    Window currentWindow = Application.Current.MainWindow;
-                    if (user.Role == "Teacher")
-                    {
-                        var mainView = new MainStudentManagerView(user);
-                        Application.Current.MainWindow = mainView;
-                        mainView.Show();
-                        currentWindow.Close();
-                    }
-                    else if (user.Role == "Student")
-                    {
-                        var mainView = new MainStudentView(user);
-                        Application.Current.MainWindow = mainView;
-                        mainView.Show();
-                        currentWindow.Close();
-                    }
-                    else if (user.Role == "Manager")
-                    {
-                        var mainView = new MainManagerView(user);
-                        Application.Current.MainWindow = mainView;
-                        mainView.Show();
-                        currentWindow.Close();
-                    }
-                    else
-                    {
-                        ErrorMessage = "Invalid role for this application";
-                    }
+                            switch (user.Role)
+                            {
+                                case "Teacher":
+                                    var mainStudentManagerView = new MainStudentManagerView(user);
+                                    Application.Current.MainWindow = mainStudentManagerView;
+                                    mainStudentManagerView.Show();
+                                    break;
+                                case "Student":
+                                    var mainStudentView = new MainStudentView(user);
+                                    Application.Current.MainWindow = mainStudentView;
+                                    mainStudentView.Show();
+                                    break;
+                                case "Manager":
+                                    var mainManagerView = new MainManagerView(user);
+                                    Application.Current.MainWindow = mainManagerView;
+                                    mainManagerView.Show();
+                                    break;
+                            }
+
+                            currentWindow?.Close();
+                        }
+                        break;
+                    default:
+                        ErrorMessage = "Invalid role for this application.";
+                        return;
                 }
-                else
-                {
-                    ErrorMessage = "Invalid email or password";
-                }
+            }
+            else
+            {
+                ErrorMessage = "Invalid email or password.";
             }
         }
 

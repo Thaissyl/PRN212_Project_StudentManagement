@@ -2,6 +2,7 @@
 using Moq;
 using PRN212_Project_StudentManagement.ViewModels;
 using PRN212_Project_StudentManagement.Models;
+using PRN212_Project_StudentManagement.Data.Interfaces;
 
 namespace StudentManagement_Test
 {

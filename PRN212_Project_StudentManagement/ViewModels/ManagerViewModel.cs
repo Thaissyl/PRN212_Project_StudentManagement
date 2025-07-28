@@ -122,12 +122,16 @@ namespace PRN212_Project_StudentManagement.ViewModels
         private void ExecuteShowTeacherInfoCommand(object obj)
         {
             var teacherInfoView = new Views.TeacherInfoView();
+            var teacherRepository = new TeacherRepository();
+            teacherInfoView.DataContext = new TeacherInfoViewModel(teacherRepository);
             teacherInfoView.ShowDialog();
         }
 
         private void ExecuteShowSubjectInfoCommand(object obj)
         {
             var subjectInfoView = new Views.SubjectInfoView();
+            var subjectRepository = new SubjectRepository();
+            subjectInfoView.DataContext = new SubjectInfoViewModel(subjectRepository);
             subjectInfoView.ShowDialog();
         }
     }

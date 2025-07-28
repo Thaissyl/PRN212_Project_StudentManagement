@@ -491,7 +491,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
 
         private void ExecuteNavigateToMarkViewCommand(object obj)
         {
-            var studentMarkViewModel = new StudentMarkViewModel(_currentUser);
+            var studentMarkViewModel = new StudentMarkViewModel(_currentUser, SelectedStudent);
             var studentMarkView = new Views.StudentMarkView(studentMarkViewModel);
             studentMarkView.Show();
         }

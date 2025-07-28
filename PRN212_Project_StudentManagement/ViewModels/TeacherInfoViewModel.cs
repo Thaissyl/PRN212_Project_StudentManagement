@@ -41,6 +41,10 @@ namespace PRN212_Project_StudentManagement.ViewModels
             DeleteTeacherCommand = new ViewModelCommand(ExecuteDeleteTeacherCommand, CanExecuteEditOrDeleteTeacher);
         }
 
+        public TeacherInfoViewModel(ITeacherRepository repository) : this(repository, new Data.Services.MessageBoxService())
+        {
+        }
+
         public TeacherInfoViewModel()
         {
         }
@@ -68,7 +72,7 @@ namespace PRN212_Project_StudentManagement.ViewModels
             if (SelectedTeacher == null) return;
             var editTeacherView = new Views.EditTeacherView(SelectedTeacher);
             editTeacherView.ShowDialog();
-            Teachers = new ObservableCollection<Teacher>(new TeacherRepository().GetAllTeachers());
+            LoadTeachers();
         }
         private void ExecuteDeleteTeacherCommand(object obj)
         {

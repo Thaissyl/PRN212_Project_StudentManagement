@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PRN212_Project_StudentManagement.Data.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PRN212_Project_StudentManagement.Data.Services
 {
-    internal class MessageBoxService
+    public class MessageBoxService : IMessageBoxService
     {
         public bool ConfirmDelete(string message)
         {

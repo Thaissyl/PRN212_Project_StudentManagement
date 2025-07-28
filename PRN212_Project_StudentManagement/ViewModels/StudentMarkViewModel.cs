@@ -339,10 +339,12 @@ namespace PRN212_Project_StudentManagement.ViewModels
         public bool IsViewing => SelectedStudentMark != null && !IsEditing && !IsAdding;
 
         public string TeacherFullName => _currentUser?.FullName;
+        private StudentDTO _selectedStudent;
 
-        public StudentMarkViewModel(User currentUser)
+        public StudentMarkViewModel(User currentUser, StudentDTO selectedStudent = null)
         {
             _currentUser = currentUser;
+            _selectedStudent = selectedStudent;
             _studentMarks = new ObservableCollection<StudentMarkViewDTO>();
             _allStudentMarks = new ObservableCollection<StudentMarkViewDTO>();
             _semesters = new ObservableCollection<string>();
@@ -363,6 +365,14 @@ namespace PRN212_Project_StudentManagement.ViewModels
             AddNewMarkCommand = new ViewModelCommand(ExecuteAddNewMarkCommand);
 
             LoadData();
+            if (_selectedStudent != null)
+            {
+                FilterMarksForStudent(_selectedStudent);
+            }
+        }
+        private void FilterMarksForStudent(StudentDTO student)
+        {
+            SearchText = student.FullName;
         }
 
         private void LoadData()
@@ -565,19 +575,25 @@ namespace PRN212_Project_StudentManagement.ViewModels
                     if (IsEditing && SelectedStudentMark != null)
                     {
                         // Update existing mark
-                        var mark = context.Marks.Find(SelectedStudentMark.MarkId);
-                        if (mark != null)
+                        var markToUpdate = new Mark
                         {
-                            mark.Mark1 = EditMark;
-                            mark.ExamDate = DateOnly.FromDateTime(EditExamDate);
-                            context.SaveChanges();
-                            
-                            // Update the DTO
-                            SelectedStudentMark.Mark = EditMark;
-                            SelectedStudentMark.ExamDate = EditExamDate;
-                            
-                            MessageBox.Show("Mark updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
+                            MarkId = SelectedStudentMark.MarkId,
+                            StudentId = SelectedStudentMark.StudentId,
+                            ClassId = context.Classes.FirstOrDefault(c => c.ClassName == SelectedStudentMark.ClassName)?.ClassId ?? 0,
+                            SubjectId = SelectedStudentMark.SubjectId,
+                            SemesterId = SelectedStudentMark.SemesterId,
+                            Mark1 = EditMark,
+                            ExamDate = DateOnly.FromDateTime(EditExamDate)
+                        };
+
+                        context.Marks.Update(markToUpdate);
+                        context.SaveChanges();
+
+                        // Update the DTO
+                        SelectedStudentMark.Mark = EditMark;
+                        SelectedStudentMark.ExamDate = EditExamDate;
+
+                        MessageBox.Show("Mark updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else if (IsAdding)
                     {
