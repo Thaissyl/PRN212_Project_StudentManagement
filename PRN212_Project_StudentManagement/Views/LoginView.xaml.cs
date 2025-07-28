@@ -11,6 +11,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using PRN212_Project_StudentManagement.Data.Interfaces;
+using PRN212_Project_StudentManagement.Data.Repositories;
+using PRN212_Project_StudentManagement.Data.Services;
+using PRN212_Project_StudentManagement.Models;
+using PRN212_Project_StudentManagement.ViewModels;
 
 namespace PRN212_Project_StudentManagement.Views
 {
@@ -19,12 +24,14 @@ namespace PRN212_Project_StudentManagement.Views
         public LoginView()
         {
             InitializeComponent();
+            IUserRepository userRepository = new UserRepository();
+            ILoginService loginService = new LoginService();
+            DataContext = new LoginViewModel(loginService);
             this.Loaded += LoginView_Loaded;
         }
 
         private void LoginView_Loaded(object sender, RoutedEventArgs e)
         {
-            // Clear the password box when the window is loaded
             if (PasswordBox != null)
             {
                 PasswordBox.Clear();

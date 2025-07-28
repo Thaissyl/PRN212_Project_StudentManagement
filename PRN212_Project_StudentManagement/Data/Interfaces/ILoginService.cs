@@ -7,7 +7,7 @@ using PRN212_Project_StudentManagement.Models;
 
 namespace PRN212_Project_StudentManagement.Data.Interfaces
 {
-    internal interface ILoginService
+    public interface ILoginService
     {
         User Authenticate(string email, string password);
     }

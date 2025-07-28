@@ -41,47 +41,81 @@ namespace PRN212_Project_StudentManagement.ViewModels
         }
 
         public ICommand LoginCommand { get; }
+        public ICommand RegisterCommand { get; }
+        public ICommand ForgotPasswordCommand { get; }
 
         public LoginViewModel(ILoginService loginService)
         {
             _loginService = loginService;
             LoginCommand = new ViewModelCommand(ExecuteLoginCommand);
+            RegisterCommand = new ViewModelCommand(ExecuteRegisterCommand);
+            ForgotPasswordCommand = new ViewModelCommand(ExecuteForgotPasswordCommand);
+
+            // Clear any previous error messages
             ErrorMessage = string.Empty;
             Email = string.Empty;
         }
 
         private void ExecuteLoginCommand(object parameter)
         {
-            string password = parameter as string;
-
-            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(password))
+            if (parameter is PasswordBox passwordBox)
             {
-                ErrorMessage = "Email and password cannot be empty.";
-                return;
-            }
+                string password = passwordBox.Password;
 
-            var user = _loginService.Authenticate(Email, password);
-
-            if (user != null)
-            {
-                if (user.Role == "Student" || user.Role == "Teacher" || user.Role == "Manager")
+                if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(password))
                 {
-                    ErrorMessage = string.Empty;
+                    ErrorMessage = "Email and password cannot be empty.";
+                    return;
+                }
+
+                var user = _loginService.Authenticate(Email, password);
+
+                if (user != null)
+                {
+                    Window currentWindow = Application.Current.MainWindow;
+                    if (user.Role == "Teacher")
+                    {
+                        var mainView = new MainStudentManagerView(user);
+                        Application.Current.MainWindow = mainView;
+                        mainView.Show();
+                        currentWindow.Close();
+                    }
+                    else if (user.Role == "Student")
+                    {
+                        var mainView = new MainStudentView(user);
+                        Application.Current.MainWindow = mainView;
+                        mainView.Show();
+                        currentWindow.Close();
+                    }
+                    else if (user.Role == "Manager")
+                    {
+                        var mainView = new MainManagerView(user);
+                        Application.Current.MainWindow = mainView;
+                        mainView.Show();
+                        currentWindow.Close();
+                    }
+                    else
+                    {
+                        ErrorMessage = "Invalid role for this application";
+                    }
                 }
                 else
                 {
-                    ErrorMessage = "Invalid role for this application.";
+                    ErrorMessage = "Invalid email or password";
                 }
             }
-            else
-            {
-                ErrorMessage = "Invalid email or password.";
-            }
         }
-    }
 
-    public interface ILoginService
-    {
-        User Authenticate(string email, string password);
+        private void ExecuteRegisterCommand(object obj)
+        {
+            var registerView = new RegisterView();
+            registerView.Show();
+        }
+
+        private void ExecuteForgotPasswordCommand(object obj)
+        {
+            var forgotPasswordView = new ForgotPasswordView();
+            forgotPasswordView.Show();
+        }
     }
 }

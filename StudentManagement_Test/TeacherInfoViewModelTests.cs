@@ -14,9 +14,9 @@ namespace StudentManagement_Test
         {
             return new List<Teacher>
             {
-                new Teacher { TeacherId = 1, User = new User { FullName = "Nguyễn A" } },
-                new Teacher { TeacherId = 2, User = new User { FullName = "Trần B" } },
-                new Teacher { TeacherId = 3, User = new User { FullName = "Lê C" } }
+                new Teacher { TeacherId = 1, User = new User { FullName = "Nguyễn Văn An" } },
+                new Teacher { TeacherId = 2, User = new User { FullName = "Phạm Quốc Đạt" } },
+                new Teacher { TeacherId = 3, User = new User { FullName = "Vũ Thị Hồng" } }
             };
         }
 
@@ -31,7 +31,7 @@ namespace StudentManagement_Test
             var vm = new TeacherInfoViewModel(mockRepo.Object, mockMsgBox.Object);
 
             Assert.Equal(3, vm.Teachers.Count);
-            Assert.Contains(vm.Teachers, t => t.User.FullName == "Nguyễn A");
+            Assert.Contains(vm.Teachers, t => t.User.FullName == "Nguyễn Văn An");
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace StudentManagement_Test
             mockRepo.Setup(r => r.GetAllTeachers()).Returns(GetSampleTeachers());
             mockRepo.Setup(r => r.DeleteTeacher(2)).Verifiable();
 
-            mockMsgBox.Setup(m => m.ConfirmDelete(It.IsAny<string>())).Returns(true); // Giả lập nhấn Yes
+            mockMsgBox.Setup(m => m.ConfirmDelete(It.IsAny<string>())).Returns(true); 
 
             var vm = new TeacherInfoViewModel(mockRepo.Object, mockMsgBox.Object);
             vm.SelectedTeacher = vm.Teachers.First(t => t.TeacherId == 2);
@@ -60,14 +60,14 @@ namespace StudentManagement_Test
             var mockMsgBox = new Mock<IMessageBoxService>();
 
             mockRepo.SetupSequence(r => r.GetAllTeachers())
-                .Returns(new List<Teacher>()) // initial empty
-                .Returns(GetSampleTeachers()); // after adding
+                .Returns(new List<Teacher>()) 
+                .Returns(GetSampleTeachers()); 
 
             var vm = new TeacherInfoViewModel(mockRepo.Object, mockMsgBox.Object, isTest: true);
 
             vm.AddTeacherCommand.Execute(null);
 
-            Assert.Equal(3, vm.Teachers.Count); // Reload sau khi thêm
+            Assert.Equal(3, vm.Teachers.Count); 
         }
     }
 }
