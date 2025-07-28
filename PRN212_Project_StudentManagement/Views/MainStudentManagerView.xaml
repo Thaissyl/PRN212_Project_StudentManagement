@@ -116,19 +116,19 @@
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding AverageMarkSemester1, StringFormat='F2'}"
-                        Header="Average Mark Kì 1" />
+                        Header="Average Mark Semester 1" />
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding AverageMarkSemester2, StringFormat='F2'}"
-                        Header="Average Mark Kì 2" />
+                        Header="Average Mark Semester 2" />
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding YearlyAverage, StringFormat='F2'}"
-                        Header="Điểm TB Cả Năm" />
+                        Header="Yearly Average" />
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding AcademicPerformance}"
-                        Header="Học Lực" />
+                        Header="Level" />
                 </DataGrid.Columns>
             </DataGrid>
 
